@@ -1,0 +1,49 @@
+language: php
+
+notifications:
+  email:
+    recipients:
+    - nicholashoobin@catalyst-au.net
+
+sudo: true
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+php:
+ - 5.5
+ - 7.0
+
+env:
+  global:
+    - IGNORE_PATHS=amd/src/cropper.js,css/cropper.css
+    - IGNORE_NAMES=*.min.js
+  matrix:
+    - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=postgres_lock_factory
+    - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=postgres_lock_factory
+    - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=db_record_lock_factory
+    - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=db_record_lock_factory
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - cd ../..
+  - composer selfupdate
+  - composer create-project -n --no-dev moodlerooms/moodle-plugin-ci ci ^1
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install -vvv
+  - moodle-plugin-ci add-config '$CFG->lock_factory = "\\tool_lockstats\\proxy";'
+  - moodle-plugin-ci add-config '$CFG->proxied_lock_factory = "\\core\\lock\\$LOCKFACTORY";'
+
+script:
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci csslint
+  - moodle-plugin-ci shifter
+  - moodle-plugin-ci jshint
+# - moodle-plugin-ci phpunit    # No tests yet
+# - moodle-plugin-ci behat      # No tests yet
