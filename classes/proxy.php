@@ -53,8 +53,7 @@ class proxy implements lock_factory {
      *
      * @param string $type - The type this lock is used for (e.g. cron, cache)
      */
-    public function __construct($type)
-    {
+    public function __construct($type) {
         global $CFG;
 
         $this->type = $type;
@@ -77,8 +76,7 @@ class proxy implements lock_factory {
      *
      * @return boolean - False if attempting to get a lock will block indefinitely.
      */
-    public function supports_timeout()
-    {
+    public function supports_timeout() {
         return $this->proxy->supports_timeout();
     }
 
@@ -90,8 +88,7 @@ class proxy implements lock_factory {
      *
      * @return boolean - True if this lock type will be automatically released when the current process ends.
      */
-    public function supports_auto_release()
-    {
+    public function supports_auto_release() {
         return $this->proxy->supports_auto_release();
     }
 
@@ -100,8 +97,7 @@ class proxy implements lock_factory {
      *
      * @return boolean - True if attempting to get 2 locks on the same resource will "stack"
      */
-    public function supports_recursion()
-    {
+    public function supports_recursion() {
         return $this->proxy->supports_recursion();
     }
 
@@ -110,8 +106,7 @@ class proxy implements lock_factory {
      *
      * @return boolean - True if this lock type is available in this environment.
      */
-    public function is_available()
-    {
+    public function is_available() {
         return $this->proxy->is_available();
     }
 
@@ -126,8 +121,7 @@ class proxy implements lock_factory {
      *                       a lock when a process ends.
      * @return \core\lock\lock|boolean - An instance of \core\lock\lock if the lock was obtained, or false.
      */
-    public function get_lock($resource, $timeout, $maxlifetime = 86400)
-    {
+    public function get_lock($resource, $timeout, $maxlifetime = 86400) {
         return $this->proxy->get_lock($resource, $timeout, $maxlifetime);
     }
 
@@ -137,8 +131,7 @@ class proxy implements lock_factory {
      * @param lock $lock - The lock to release.
      * @return boolean - True if the lock is no longer held (including if it was never held).
      */
-    public function release_lock(lock $lock)
-    {
+    public function release_lock(lock $lock) {
         return $this->proxy->release_lock($lock);
     }
 
@@ -149,8 +142,7 @@ class proxy implements lock_factory {
      * @param int $maxlifetime - new max time to hold the lock
      * @return boolean - True if the lock was extended.
      */
-    public function extend_lock(lock $lock, $maxlifetime = 86400)
-    {
+    public function extend_lock(lock $lock, $maxlifetime = 86400) {
         return $this->proxy->extend_lock($lock, $maxlifetime);
     }
 }
