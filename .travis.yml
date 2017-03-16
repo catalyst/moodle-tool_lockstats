@@ -12,19 +12,41 @@ cache:
     - $HOME/.composer/cache
 
 php:
- - 5.5
- - 7.0
+  - 5.5
+  - 7.0
 
 env:
-  matrix:
-    - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=postgres_lock_factory
-    - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=postgres_lock_factory
-    - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=postgres_lock_factory
-    - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=postgres_lock_factory
-    - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
-    - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
-    - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=db_record_lock_factory
-    - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=postgres_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=postgres_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=postgres_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=postgres_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=postgres_lock_factory
+  - DB=pgsql MOODLE_BRANCH=master LOCKFACTORY=postgres_lock_factory
+  - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=db_record_lock_factory
+  - DB=mysqli MOODLE_BRANCH=master LOCKFACTORY=db_record_lock_factory
+
+matrix:
+  exclude:
+    - php: 5.5
+     env: DB=mysqli MOODLE_BRANCH=master LOCKFACTORY=db_record_lock_factory
+    - php: 5.5
+     env: DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=db_record_lock_factory
+    - php: 7.0
+     env: DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
+    - php: 7.0
+     env: DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
+    - php: 5.5
+     env: DB=pgsql MOODLE_BRANCH=master LOCKFACTORY=db_record_lock_factory
+    - php: 5.5
+     env: DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=db_record_lock_factory
+    - php: 7.0
+     env: DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
+    - php: 7.0
+     env: DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
 
 before_install:
   - phpenv config-rm xdebug.ini
