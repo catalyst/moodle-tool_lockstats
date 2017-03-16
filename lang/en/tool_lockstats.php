@@ -23,6 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+$string['blacklist'] = '';
+$string['blacklistdesc'] = '';
+$string['cleanup'] = '';
+$string['cleanupdesc'] = '';
 $string['pluginname'] = 'Lock statistics';
+$string['threshold'] = '';
+$string['thresholddesc'] = '';
 
