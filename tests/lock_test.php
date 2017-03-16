@@ -113,6 +113,4 @@ class lock_testcase extends advanced_testcase {
         $lockfactory = \core\lock\lock_config::get_lock_factory('test');
         $this->run_on_lock_factory($lockfactory);
     }
-
-
 }

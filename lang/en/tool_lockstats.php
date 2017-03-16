@@ -35,4 +35,3 @@ $string['cleanupdesc'] = '';
 $string['pluginname'] = 'Lock statistics';
 $string['threshold'] = '';
 $string['thresholddesc'] = '';
-
