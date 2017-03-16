@@ -30,7 +30,9 @@ use core\lock\lock;
 use core\lock\lock_config;
 use core\lock\lock_factory;
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
 
 /**
  * Proxy lock factory.
