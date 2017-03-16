@@ -41,20 +41,10 @@ class lock_testcase extends advanced_testcase {
      * Clean up the database.
      */
     protected function setUp() {
-        global $CFG, $DB;
+        global $CFG;
 
-        $family = $DB->get_dbfamily();
-
-        if ($family == 'postgres') {
-            $type = 'postgres_lock_factory';
-        } else if ($family == 'mysql') {
-            $type = 'db_record_lock_factory';
-        } else {
-            $type = 'file_lock_factory';
-        }
-
-        $CFG->lock_factory = "\\tool_lockstats\\proxy";
-        $CFG->proxied_lock_factory = "\\core\\lock\\$type";
+        $CFG->lock_factory = $CFG->phpunit_lock_factory;
+        $CFG->proxied_lock_factory = $CFG->phpunit_proxied_lock_factory;
 
         $this->resetAfterTest(true);
     }
