@@ -1,3 +1,5 @@
+Travis integration: [![Build Status](https://travis-ci.org/catalyst/moodle-tool_lockstats.svg?branch=master)](https://travis-ci.org/catalyst/moodle-tool_lockstats)
+
 # tool_lockstats
 
 A lock statistics admin tool, specifically tailored to report on cron task timings.
