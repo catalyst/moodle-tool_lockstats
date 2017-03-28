@@ -31,5 +31,5 @@ if (!defined('MOODLE_INTERNAL')) {
 $plugin->version   = 2017032800;
 $plugin->release   = 2017031500;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2013111800; // Moodle 2.6 release and upwards.
+$plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
 $plugin->component = 'tool_lockstats';
