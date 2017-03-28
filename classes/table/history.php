@@ -47,7 +47,7 @@ class history extends table_sql {
         parent::__construct('tool_lockstats_history' . $id);
 
         $columns = array(
-            'task'  => get_string('table_resource', 'tool_lockstats'),
+            'task'      => get_string('table_resource', 'tool_lockstats'),
             'duration'  => get_string('table_duration', 'tool_lockstats'),
             'lockcount' => get_string('table_lockcount', 'tool_lockstats'),
             'host'      => get_string('table_host', 'tool_lockstats'),
