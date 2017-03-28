@@ -36,7 +36,7 @@ admin_externalpage_setup('tool_lockstats');
 
 $taskid = required_param('task', PARAM_ALPHANUM);
 
-$detail = new tool_lockstats\table\detail(new moodle_url('/admin/tool/lockstats/detail.php', ['task' => $taskid]), $taskid);
+$detail = new tool_lockstats\table\detail(new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $taskid]), $taskid);
 
 if ($detail->is_downloading($download, 'tool_lockstats_detail', 'tool_lockstats_detail')) {
     $detail->download();

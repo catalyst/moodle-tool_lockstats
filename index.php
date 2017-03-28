@@ -37,7 +37,7 @@ $download = optional_param('download', '', PARAM_ALPHA);
 $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained DESC');
 
 $current = new tool_lockstats\table\locks();
-$history = new tool_lockstats\table\history(new moodle_url('/admin/tool/lockstats'));
+$history = new tool_lockstats\table\history(new moodle_url("/$CFG->admin/tool/lockstats"));
 $tasks = new tool_lockstats\table\tasks();
 
 if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstats_history')) {
