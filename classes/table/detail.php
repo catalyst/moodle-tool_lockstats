@@ -94,7 +94,7 @@ class detail extends table_sql {
         $params = ['taskid' => $this->taskid];
 
         $sql = "SELECT COUNT(1)
-                  FROM {tool_lockstats_history}MATCH 
+                  FROM {tool_lockstats_history}
                  WHERE taskid = :taskid";
 
         $total = $DB->count_records_sql($sql, $params);
