@@ -45,11 +45,13 @@ class tasks extends html_table {
 
         parent::__construct();
 
-        $this->head = array(get_string('name'),
+        $this->head = [
+            get_string('name'),
             get_string('component', 'tool_task'),
             get_string('lastruntime', 'tool_task'),
             get_string('nextruntime', 'tool_task'),
-            get_string('faildelay', 'tool_task'));
+            get_string('faildelay', 'tool_task')
+        ];
 
         $this->attributes['class'] = 'admintable generaltable';
 
