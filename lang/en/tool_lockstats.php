@@ -28,12 +28,12 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$string['blacklist'] = '';
-$string['blacklistdesc'] = '';
-$string['cleanup'] = '';
-$string['cleanupdesc'] = '';
-$string['debug'] = '';
-$string['debugdesc'] = '';
+$string['blacklist'] = 'History blacklist';
+$string['blacklistdesc'] = 'These are identified by their classpath, eg. \tool_crawler\task\crawl_task';
+$string['cleanup'] = 'Cleanup history';
+$string['cleanupdesc'] = 'Automatically prune the history table after this value in days.';
+$string['debug'] = 'Debug';
+$string['debugdesc'] = 'Print additional helpful debug output in the cron.log';
 $string['h1_current'] = 'Current Locks';
 $string['h1_detail'] = 'Task Details';
 $string['h1_history'] = 'Lock History';
@@ -45,5 +45,5 @@ $string['table_lockcount'] = 'Count';
 $string['table_pid'] = 'PID';
 $string['table_released'] = 'Time released';
 $string['table_resource'] = 'Resource';
-$string['threshold'] = '';
-$string['thresholddesc'] = '';
+$string['threshold'] = 'History threshold';
+$string['thresholddesc'] = 'Only log new history entries when the cron task time exceeds this value in seconds.';
