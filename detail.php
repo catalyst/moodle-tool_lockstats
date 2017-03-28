@@ -30,13 +30,17 @@ require_once($CFG->libdir . '/adminlib.php');
 require_login();
 require_capability('moodle/site:config', context_system::instance());
 
-$download = optional_param('download', '', PARAM_ALPHA);
-
 admin_externalpage_setup('tool_lockstats');
 
 $taskid = required_param('task', PARAM_ALPHANUM);
 
-$detail = new tool_lockstats\table\detail(new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $taskid]), $taskid);
+$download = optional_param('download', '', PARAM_ALPHA);
+
+$baseurl = new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $taskid]);
+
+$PAGE->navbar->add(get_string('h1_detail', 'tool_lockstats'));
+
+$detail = new tool_lockstats\table\detail($baseurl, $taskid);
 
 if ($detail->is_downloading($download, 'tool_lockstats_detail', 'tool_lockstats_detail')) {
     $detail->download();
@@ -44,6 +48,7 @@ if ($detail->is_downloading($download, 'tool_lockstats_detail', 'tool_lockstats_
 
 echo $OUTPUT->header();
 
+echo html_writer::tag('h1', get_string('h1_detail', 'tool_lockstats'));
 $detail->out(50, false);
 
 echo $OUTPUT->footer();

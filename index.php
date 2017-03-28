@@ -49,10 +49,12 @@ echo $OUTPUT->header();
 // Current locks.
 echo html_writer::tag('h1', 'Current Locks');
 echo html_writer::table($current);
+echo html_writer::empty_tag('br');
 
 // The Previous N locks.
 echo html_writer::tag('h1', 'Lock History');
 $history->out(10, false);
+echo html_writer::empty_tag('br');
 
 // A list of tasks with history, the ability to select one and see its history filtered.
 echo html_writer::tag('h1', 'Task Details');

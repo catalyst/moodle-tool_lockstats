@@ -29,6 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
+use html_writer;
 use moodle_url;
 use table_sql;
 
@@ -118,6 +119,19 @@ class history extends table_sql {
         }
 
         return format_time($duration);
+    }
+
+    public function col_task($values) {
+        global $CFG;
+
+        if ($this->is_downloading()) {
+            return $values->task;
+        }
+
+        $url = new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $values->taskid]);
+        $link = html_writer::link($url, $values->task);
+
+        return $link;
     }
 
 }

@@ -64,7 +64,6 @@ class detail extends table_sql {
 
         $this->define_columns(array_keys($columns));
         $this->define_headers(array_values($columns));
-
         $this->define_baseurl($baseurl);
 
         $this->set_attribute('class', 'generaltable admintable');
@@ -130,7 +129,10 @@ class detail extends table_sql {
         }
 
         if ($duration > 0) {
-            return format_time($duration);
+            $data = explode(' ', format_time($duration));
+            if (count($data) == 2) {
+                return sprintf('%.4g %s', $data[0], $data[1]);
+            }
         }
 
         return $duration;
