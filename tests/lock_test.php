@@ -60,7 +60,17 @@ class lock_testcase extends advanced_testcase {
             $lock1 = $lockfactory->get_lock('abc', 2);
             $this->assertNotEmpty($lock1, 'Get a lock');
 
-            // TODO: Investigate recursive lock implementation.
+            if ($lockfactory->supports_timeout()) {
+                if ($lockfactory->supports_recursion()) {
+                    $lock2 = $lockfactory->get_lock('abc', 2);
+                    $this->assertNotEmpty($lock2, 'Get a stacked lock');
+                    $this->assertTrue($lock2->release(), 'Release a stacked lock');
+                } else {
+                    // This should timeout.
+                    $lock2 = $lockfactory->get_lock('abc', 2);
+                    $this->assertFalse($lock2, 'Cannot get a stacked lock');
+                }
+            }
 
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');

@@ -52,7 +52,7 @@ class proxy_lock_factory implements lock_factory {
     protected $type;
 
     /** @var array $openlocks - An array of locks that have been obtained. */
-    protected $openlocks = array();
+    protected $openlocks = [];
 
     /** @var boolean $debug - Debug logging. */
     private $debug;
@@ -141,7 +141,7 @@ class proxy_lock_factory implements lock_factory {
         if ($lock) {
             $proxylock = new lock($task, $this);
 
-            $this->openlocks[$proxylock->get_key()] = $lock;
+            $this->openlocks[$proxylock->get_key()][] = $lock;
 
             $this->log_lock($proxylock->get_key());
 
@@ -164,7 +164,13 @@ class proxy_lock_factory implements lock_factory {
     public function release_lock(lock $proxylock) {
         $task = $proxylock->get_key();
 
-        $lock = $this->openlocks[$proxylock->get_key()];
+        $openlocks = $this->openlocks[$proxylock->get_key()];
+
+        if (empty($openlocks)) {
+            return true;
+        }
+
+        $lock = array_pop($this->openlocks[$proxylock->get_key()]);
 
         $status = $this->proxiedlockfactory->release_lock($lock);
 
@@ -173,14 +179,13 @@ class proxy_lock_factory implements lock_factory {
                 mtrace('tool_lockstats [lock released]: ' . $task);
             }
 
-            $lock->release();
-
             $this->log_unlock($task);
-
-            unset($this->openlocks[$task]);
         }
 
-        return $status;
+        $lock->release();
+        unset($lock);
+
+        return true;
     }
 
     /**
@@ -200,12 +205,14 @@ class proxy_lock_factory implements lock_factory {
      */
     public function auto_release() {
         // Called from the shutdown handler. Must release all open locks.
-        foreach ($this->openlocks as $task => $unused) {
-            $lock = new lock($task, $this);
+        foreach ($this->openlocks as $id => $locks) {
+            foreach ($locks as $task => $unused) {
+                $lock = new lock($task, $this);
 
-            $this->log_unlock($task);
+                $this->log_unlock($task);
 
-            $lock->release();
+                $lock->release();
+            }
         }
     }
 
