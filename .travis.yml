@@ -57,7 +57,7 @@ before_install:
 
 install:
   - moodle-plugin-ci install -vvv
-  - moodle-plugin-ci add-config '$CFG->phpunit_lock_factory = "\\tool_lockstats\\proxy";'
+  - moodle-plugin-ci add-config '$CFG->phpunit_lock_factory = "\\tool_lockstats\\proxy_lock_factory";'
   - moodle-plugin-ci add-config "\$CFG->phpunit_proxied_lock_factory = \"\\core\\lock\\${LOCKFACTORY}\";"
 
 script:
