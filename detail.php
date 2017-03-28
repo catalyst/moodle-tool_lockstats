@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Proxy lock statistics, detail page.
  *
  * @package    tool_lockstats
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -24,12 +24,26 @@
  */
 
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+require_once(dirname(__FILE__) . '/../../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
+
+require_login();
+require_capability('moodle/site:config', context_system::instance());
+
+$download = optional_param('download', '', PARAM_ALPHA);
+
+admin_externalpage_setup('tool_lockstats');
+
+$taskid = required_param('task', PARAM_ALPHANUM);
+
+$detail = new tool_lockstats\table\detail(new moodle_url('/admin/tool/lockstats/detail.php', ['task' => $taskid]), $taskid);
+
+if ($detail->is_downloading($download, 'tool_lockstats_detail', 'tool_lockstats_detail')) {
+    $detail->download();
 }
 
-$plugin->version   = 2017032800;
-$plugin->release   = 2017031500;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2013111800; // Moodle 2.6 release and upwards.
-$plugin->component = 'tool_lockstats';
+echo $OUTPUT->header();
+
+$detail->out(50, false);
+
+echo $OUTPUT->footer();

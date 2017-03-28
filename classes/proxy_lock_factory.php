@@ -1,0 +1,328 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Proxy lock factory.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+namespace tool_lockstats;
+
+use core\lock\lock;
+use core\lock\lock_config;
+use core\lock\lock_factory;
+use stdClass;
+
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
+
+/**
+ * Proxy lock factory.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class proxy_lock_factory implements lock_factory {
+
+    /** @var lock_factory $proxiedlockfactory - The real lock factory object. */
+    protected $proxiedlockfactory;
+
+    /** @var string $type - The type of lock, e.g. cache, cron, session. */
+    protected $type;
+
+    /** @var array $openlocks - An array of locks that have been obtained. */
+    protected $openlocks = array();
+
+    /** @var boolean $debug - Debug logging. */
+    private $debug;
+
+    /**
+     * Define the constructor signature required by the lock_config class.
+     *
+     * @param string $type - The type this lock is used for (e.g. cron, cache)
+     */
+    public function __construct($type) {
+        global $CFG;
+
+        $this->debug = get_config('tool_lockstats', 'debug');
+
+        $this->type = $type;
+
+        $lockfactory = $CFG->lock_factory;
+
+        $proxiedfactory = $CFG->proxied_lock_factory;
+
+        // Set the real lock factory.
+        $CFG->lock_factory = $proxiedfactory;
+
+        // Obtain a proxy object of the real lock factory.
+        $this->proxiedlockfactory = lock_config::get_lock_factory($type);
+
+        // Set the value back to our string.
+        $CFG->lock_factory = $lockfactory;
+
+        \core_shutdown_manager::register_function(array($this, 'auto_release'));
+    }
+
+    /**
+     * Return information about the blocking behaviour of the locks on this platform.
+     *
+     * @return boolean - False if attempting to get a lock will block indefinitely.
+     */
+    public function supports_timeout() {
+        return $this->proxiedlockfactory->supports_timeout();
+    }
+
+    /**
+     * Will this lock be automatically released when the process ends.
+     * This should never be relied upon in code - but is useful in the case of
+     * fatal errors. If a lock type does not support this auto release,
+     * the max lock time parameter must be obeyed to eventually clean up a lock.
+     *
+     * @return boolean - True if this lock type will be automatically released when the current process ends.
+     */
+    public function supports_auto_release() {
+        return $this->proxiedlockfactory->supports_auto_release();
+    }
+
+    /**
+     * Supports recursion.
+     *
+     * @return boolean - True if attempting to get 2 locks on the same resource will "stack"
+     */
+    public function supports_recursion() {
+        return $this->proxiedlockfactory->supports_recursion();
+    }
+
+    /**
+     * Is available.
+     *
+     * @return boolean - True if this lock type is available in this environment.
+     */
+    public function is_available() {
+        return $this->proxiedlockfactory->is_available();
+    }
+
+    /**
+     * Get a lock within the specified timeout or return false.
+     *
+     * @param string $task - The identifier for the lock. Should use frankenstyle prefix.
+     * @param int $timeout - The number of seconds to wait for a lock before giving up.
+     *                       Not all lock types will support this.
+     * @param int $maxlifetime - The number of seconds to wait before reclaiming a stale lock.
+     *                       Not all lock types will use this - e.g. if they support auto releasing
+     *                       a lock when a process ends.
+     * @return lock|boolean - An instance of \core\lock\lock if the lock was obtained, or false.
+     */
+    public function get_lock($task, $timeout, $maxlifetime = 86400) {
+        $lock = $this->proxiedlockfactory->get_lock($task, $timeout, $maxlifetime);
+
+        if ($lock) {
+            $proxylock = new lock($task, $this);
+
+            $this->openlocks[$proxylock->get_key()] = $lock;
+
+            $this->log_lock($proxylock->get_key());
+
+            if ($this->debug) {
+                mtrace('tool_lockstats [lock obtained]: ' . $proxylock->get_key());
+            }
+
+            return $proxylock;
+        }
+
+        return false;
+    }
+
+    /**
+     * Release a lock that was previously obtained with @lock.
+     *
+     * @param lock $proxylock - The lock to release.
+     * @return boolean - True if the lock is no longer held (including if it was never held).
+     */
+    public function release_lock(lock $proxylock) {
+        $task = $proxylock->get_key();
+
+        $lock = $this->openlocks[$proxylock->get_key()];
+
+        $status = $this->proxiedlockfactory->release_lock($lock);
+
+        if ($status) {
+            if ($this->debug) {
+                mtrace('tool_lockstats [lock released]: ' . $task);
+            }
+
+            $lock->release();
+
+            $this->log_unlock($task);
+
+            unset($this->openlocks[$task]);
+        }
+
+        return $status;
+    }
+
+    /**
+     * Extend the timeout on a held lock.
+     *
+     * @param lock $lock - lock obtained from this factory
+     * @param int $maxlifetime - new max time to hold the lock
+     * @return boolean - True if the lock was extended.
+     */
+    public function extend_lock(lock $lock, $maxlifetime = 86400) {
+        return $this->proxiedlockfactory->extend_lock($lock, $maxlifetime);
+    }
+
+    /**
+     * Auto release any open locks on shutdown.
+     * This is required, because we may be using persistent DB connections.
+     */
+    public function auto_release() {
+        // Called from the shutdown handler. Must release all open locks.
+        foreach ($this->openlocks as $task => $unused) {
+            $lock = new lock($task, $this);
+
+            $this->log_unlock($task);
+
+            $lock->release();
+        }
+    }
+
+    private function log_lock($task) {
+        global $DB;
+
+        $params = ['task' => $task];
+
+        $select = $DB->sql_compare_text('task') . ' = ' . $DB->sql_compare_text(':task');
+
+        $record = $DB->get_record_select('tool_lockstats_locks', $select, $params);
+
+        if (empty($record)) {
+            $record = new stdClass();
+            $record->task = $task;
+            $record->gained = time();
+            $record->host = gethostname();
+            $record->pid = posix_getpid();
+
+            $DB->insert_record('tool_lockstats_locks', $record);
+        } else {
+            $record->gained = time();
+            $record->released = null;
+            $record->host = gethostname();
+            $record->pid = posix_getpid();
+
+            $DB->update_record('tool_lockstats_locks', $record);
+        }
+
+        return $record;
+    }
+
+    private function log_unlock($task) {
+        global $DB;
+
+        $select = $DB->sql_compare_text('task') . ' = ' . $DB->sql_compare_text(':task');
+
+        $params = ['task' => $task];
+
+        $record = $DB->get_record_select('tool_lockstats_locks', $select, $params);
+
+        if ($record) {
+            $delta = time() - $record->gained;
+
+            $record->released = time();
+            $record->duration = $delta;
+
+            $DB->update_record('tool_lockstats_locks', $record);
+
+            // Prevent logging tasks that exist in the blacklist.
+            $blacklist = get_config('tool_lockstats', 'blacklist');
+            foreach (explode(PHP_EOL, $blacklist) as $item) {
+                if ($item == $task) {
+                    if ($this->debug) {
+                        mtrace('tool_lockstats [history blacklist]: ' . $item);
+                    }
+                    return false;
+                }
+            }
+
+            if ($delta > get_config('tool_lockstats', 'threshold')) {
+                // The record is duration is higher than the threshold. Create a new record.
+                $this->log_history($record);
+            } else {
+                // Lets update the lock count instead.
+                $this->log_update_count($record);
+            }
+
+        }
+    }
+
+    private function log_history($record) {
+        global $DB;
+
+        $record->duration = $record->released - $record->gained;
+        $record->lockcount = 1;
+        $record->taskid = $record->id;
+
+        $DB->insert_record('tool_lockstats_history', $record);
+    }
+
+    private function log_update_count($record) {
+        global $DB;
+
+        $history = $this->get_recent_history($record->id);
+
+        if ($history) {
+            $history->lockcount += 1;
+            $history->gained = $record->gained;
+            $history->released = time();
+            $history->duration += $record->duration;
+
+            $DB->update_record('tool_lockstats_history', $history);
+        } else {
+            $this->log_history($record);
+        }
+
+    }
+
+    private function get_recent_history($taskid) {
+        global $DB;
+
+        $sql = "SELECT *
+                  FROM {tool_lockstats_history}
+                 WHERE taskid = :taskid0
+                 AND id = (SELECT MAX(id)
+                             FROM {tool_lockstats_history}
+                            WHERE taskid = :taskid1)";
+
+        $params = [
+            'taskid0' => $taskid,
+            'taskid1' => $taskid
+        ];
+
+        $record = $DB->get_record_sql($sql, $params);
+
+        return $record;
+    }
+
+}

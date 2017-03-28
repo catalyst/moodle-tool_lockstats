@@ -7,6 +7,7 @@
         <TABLE NAME="tool_lockstats_locks" COMMENT="Table to store current locks">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="task" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="gained" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="released" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="host" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -19,14 +20,18 @@
         <TABLE NAME="tool_lockstats_history" COMMENT="Historic log of locked tasks.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="timestart" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="timestop" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="totalduration" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="lockcount" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="lasthost" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="taskid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="task" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="gained" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="released" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="duration" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="lockcount" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" DEFAULT="0"/>
+                <FIELD NAME="host" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="pid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="tool_lockstats_locks" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
     </TABLES>

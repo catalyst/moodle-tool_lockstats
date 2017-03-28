@@ -29,9 +29,11 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 if ($hassiteconfig) {
+    $url = new moodle_url("/$CFG->admin/tool/lockstats");
+    $ADMIN->add('server', new admin_externalpage('tool_lockstats', get_string('pluginname', 'tool_lockstats'), $url));
 
     // Local plugin settings.
-    $settings = new admin_settingpage('tool_lockstats', get_string('pluginname', 'tool_lockstats'));
+    $settings = new admin_settingpage('tool_lockstats_settings', get_string('pluginname', 'tool_lockstats'));
 
     $ADMIN->add('tools', $settings);
 
@@ -40,17 +42,21 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_configtext('tool_lockstats/cleanup',
             new lang_string('cleanup',     'tool_lockstats'),
             new lang_string('cleanupdesc', 'tool_lockstats'),
-            ''));
+            '30'));
 
         $settings->add(new admin_setting_configtextarea('tool_lockstats/blacklist',
             new lang_string('blacklist',     'tool_lockstats'),
             new lang_string('blacklistdesc', 'tool_lockstats'),
-            ''));
+            'core_cron'));
 
         $settings->add(new admin_setting_configtext('tool_lockstats/threshold',
            new lang_string('threshold',     'tool_lockstats'),
            new lang_string('thresholddesc', 'tool_lockstats'),
-           ''));
-    }
+           '60'));
 
+        $settings->add(new admin_setting_configcheckbox('tool_lockstats/debug',
+            new lang_string('debug',        'tool_lockstats'),
+            new lang_string('debugdesc',    'tool_lockstats'),
+            '0'));
+    }
 }
