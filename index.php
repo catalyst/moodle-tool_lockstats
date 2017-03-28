@@ -59,9 +59,3 @@ echo html_writer::tag('h1', 'Task Details');
 echo html_writer::table($tasks);
 
 echo $OUTPUT->footer();
-
-
-$string['h1_current'] = 'Current Locks';
-$string['h1_detail'] = 'Task Details';
-$string['h1_history'] = 'Lock History';
-
