@@ -58,7 +58,7 @@ $history->out(10, false);
 echo html_writer::empty_tag('br');
 
 // A list of tasks with history, the ability to select one and see its history filtered.
-echo html_writer::tag('h1', get_string('h1_detail', 'tool_lockstats'));
+echo html_writer::tag('h1', get_string('h1_nexttask', 'tool_lockstats'));
 echo html_writer::table($tasks);
 
 echo $OUTPUT->footer();
