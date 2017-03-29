@@ -138,7 +138,7 @@ class history extends table_sql {
         $duration = $values->duration;
 
         if ($lockcount > 0) {
-            $duration = $values->duration / $values->lockcount;
+            $duration = sprintf('%.4f',$values->duration / $values->lockcount);
         }
 
         if ($this->is_downloading()) {

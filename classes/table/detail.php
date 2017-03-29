@@ -149,7 +149,7 @@ class detail extends table_sql {
         $duration = $values->duration;
 
         if ($lockcount > 0) {
-            $duration = $values->duration / $values->lockcount;
+            $duration = sprintf('%.4f',$values->duration / $values->lockcount);
         }
 
         if ($this->is_downloading()) {
@@ -157,10 +157,7 @@ class detail extends table_sql {
         }
 
         if ($duration > 0) {
-            $data = explode(' ', format_time($duration));
-            if (count($data) == 2) {
-                return sprintf('%.4g %s', $data[0], $data[1]);
-            }
+            return format_time($duration);
         }
 
         return $duration;
