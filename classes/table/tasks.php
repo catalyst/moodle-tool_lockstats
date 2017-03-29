@@ -68,6 +68,10 @@ class tasks extends html_table {
 
         $tasks = \core\task\manager::get_all_scheduled_tasks();
 
+        usort($tasks, function($a, $b) {
+            return $b->get_last_run_time() - $a->get_last_run_time();
+        });
+
         $never = get_string('never');
         $asap = get_string('asap', 'tool_task');
         $disabledstr = get_string('taskdisabled', 'tool_task');
