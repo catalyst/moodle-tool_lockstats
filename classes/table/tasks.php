@@ -104,7 +104,7 @@ class tasks extends html_table {
                 }
             }
 
-            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time()) : $never;
+            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time(), '%a, %e %b %G %l:%M %p') : $never;
             $nextrun = $task->get_next_run_time();
             $disabled = false;
 
@@ -115,7 +115,7 @@ class tasks extends html_table {
                 $disabled = true;
                 $nextrun = $disabledstr;
             } else if ($nextrun > time()) {
-                $nextrun = userdate($nextrun);
+                $nextrun = userdate($nextrun, '%a, %e %b %G %l:%M %p');
             } else {
                 $nextrun = $asap;
             }
