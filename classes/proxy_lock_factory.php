@@ -164,11 +164,7 @@ class proxy_lock_factory implements lock_factory {
     public function release_lock(lock $proxylock) {
         $task = $proxylock->get_key();
 
-        $openlocks = $this->openlocks[$proxylock->get_key()];
-
-        if (empty($openlocks)) {
-            return true;
-        }
+        $this->openlocks[$proxylock->get_key()];
 
         $lock = array_pop($this->openlocks[$proxylock->get_key()]);
 
