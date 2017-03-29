@@ -31,8 +31,17 @@ if (!defined('MOODLE_INTERNAL')) {
 
 use html_writer;
 use moodle_url;
+use stdClass;
 use table_sql;
 
+/**
+ * Proxy lock factory, history table.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class history extends table_sql {
     /** @var int Incrementing table id. */
     private static $autoid = 0;
@@ -90,6 +99,12 @@ class history extends table_sql {
         $this->out($total, false);
     }
 
+    /**
+     * The time the lock was gained.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_gained($values) {
         if ($this->is_downloading()) {
             return $values->gained;
@@ -98,6 +113,12 @@ class history extends table_sql {
         return userdate($values->gained, '%Y-%m-%d %H:%M:%S');
     }
 
+    /**
+     * The time the lock was released.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_released($values) {
         if ($this->is_downloading()) {
             return $values->released;
@@ -106,6 +127,12 @@ class history extends table_sql {
         return userdate($values->released, '%Y-%m-%d %H:%M:%S');
     }
 
+    /**
+     * The time the lock was held for.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_duration($values) {
         $lockcount = $values->lockcount;
         $duration = $values->duration;
@@ -121,6 +148,12 @@ class history extends table_sql {
         return format_time($duration);
     }
 
+    /**
+     * A link to the task.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_task($values) {
         global $CFG;
 

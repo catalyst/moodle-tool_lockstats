@@ -25,17 +25,26 @@
 
 namespace tool_lockstats\table;
 
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
+
 use core_component;
 use html_table;
 use html_table_cell;
 use html_table_row;
 use html_writer;
 use moodle_url;
+use stdClass;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
-}
-
+/**
+ * Proxy lock factory, task list table.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class tasks extends html_table {
     /**
      * Constructor
@@ -127,6 +136,12 @@ class tasks extends html_table {
         $this->data = $data;
     }
 
+    /**
+     * Returns the record of the most recent history entry for the task.
+     *
+     * @param string $task
+     * @return false|stdClass
+     */
     private function task_has_history($task) {
         global $DB;
 

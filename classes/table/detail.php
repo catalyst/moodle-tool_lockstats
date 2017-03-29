@@ -30,12 +30,22 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 use moodle_url;
+use stdClass;
 use table_sql;
 
+/**
+ * Proxy lock factory, detail table.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class detail extends table_sql {
     /** @var int Incrementing table id. */
     private static $autoid = 0;
 
+    /** @var int The taskid. */
     private $taskid;
 
     /**
@@ -100,6 +110,12 @@ class detail extends table_sql {
         $this->out($total, false);
     }
 
+    /**
+     * The time the lock was gained.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_gained($values) {
         if ($this->is_downloading()) {
             return $values->gained;
@@ -108,6 +124,12 @@ class detail extends table_sql {
         return userdate($values->gained, '%Y-%m-%d %H:%M:%S');
     }
 
+    /**
+     * The time the lock was released.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_released($values) {
         if ($this->is_downloading()) {
             return $values->released;
@@ -116,6 +138,12 @@ class detail extends table_sql {
         return userdate($values->released, '%Y-%m-%d %H:%M:%S');
     }
 
+    /**
+     * The time the lock was held for.
+     *
+     * @param stdClass $values
+     * @return string
+     */
     public function col_duration($values) {
         $lockcount = $values->lockcount;
         $duration = $values->duration;

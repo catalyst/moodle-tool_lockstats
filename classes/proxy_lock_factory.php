@@ -216,6 +216,12 @@ class proxy_lock_factory implements lock_factory {
         }
     }
 
+    /**
+     * Log information from the $task to the current lock table. This is for when a lock is gained.
+     *
+     * @param string $task
+     * @return false|stdClass
+     */
     private function log_lock($task) {
         global $DB;
 
@@ -245,6 +251,12 @@ class proxy_lock_factory implements lock_factory {
         return $record;
     }
 
+    /**
+     * Log information from the $task to the current lock table. This is for when a lock is released.
+     *
+     * @param string $task
+     * @return bool
+     */
     private function log_unlock($task) {
         global $DB;
 
@@ -284,6 +296,11 @@ class proxy_lock_factory implements lock_factory {
         }
     }
 
+    /**
+     * When a lock is released, log the $record into the history table.
+     *
+     * @param stdClass $record
+     */
     private function log_history($record) {
         global $DB;
 
@@ -294,6 +311,11 @@ class proxy_lock_factory implements lock_factory {
         $DB->insert_record('tool_lockstats_history', $record);
     }
 
+    /**
+     * If the threshold has not been met, update the lock count for the most recent history entry.
+     *
+     * @param stdClass $record
+     */
     private function log_update_count($record) {
         global $DB;
 
@@ -312,6 +334,12 @@ class proxy_lock_factory implements lock_factory {
 
     }
 
+    /**
+     * Obtain the most recent history entry for the taskid specified.
+     *
+     * @param int $taskid
+     * @return stdClass $record
+     */
     private function get_recent_history($taskid) {
         global $DB;
 

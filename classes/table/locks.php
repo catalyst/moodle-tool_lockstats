@@ -32,7 +32,18 @@ if (!defined('MOODLE_INTERNAL')) {
 use html_table;
 use html_table_row;
 
+/**
+ * Proxy lock factory, current list table.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class locks extends html_table {
+    /**
+     * Constructor
+     */
     public function __construct() {
         parent::__construct();
 
@@ -75,6 +86,11 @@ class locks extends html_table {
         $this->data = $rows;
     }
 
+    /**
+     * Obtain an array of all the currently held locks.
+     *
+     * @return array
+     */
     private function get_current_locks() {
         global $DB;
 
