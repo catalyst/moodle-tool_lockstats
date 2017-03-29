@@ -31,7 +31,7 @@ if (!defined('MOODLE_INTERNAL')) {
 $string['blacklist'] = 'History blacklist';
 $string['blacklistdesc'] = 'These are identified by their classpath, eg. \tool_crawler\task\crawl_task';
 $string['cleanup'] = 'Cleanup history';
-$string['cleanupdesc'] = 'Automatically prune the history table after this value in days.';
+$string['cleanupdesc'] = 'Automatically prune the history table after this value.';
 $string['debug'] = 'Debug';
 $string['debugdesc'] = 'Print additional helpful debug output in the cron.log';
 $string['h1_current'] = 'Current Running Tasks';
@@ -47,4 +47,4 @@ $string['table_released'] = 'Time released';
 $string['table_resource'] = 'Resource';
 $string['table_task'] = 'Task';
 $string['threshold'] = 'History threshold';
-$string['thresholddesc'] = 'Only log new history entries when the cron task time exceeds this value in seconds.';
+$string['thresholddesc'] = 'Only log new history entries when the cron task time exceeds this value.';

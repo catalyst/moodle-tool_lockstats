@@ -39,20 +39,20 @@ if ($hassiteconfig) {
 
     if (!during_initial_install()) {
 
-        $settings->add(new admin_setting_configtext('tool_lockstats/cleanup',
+        $settings->add(new admin_setting_configduration('tool_lockstats/cleanup',
             new lang_string('cleanup',     'tool_lockstats'),
             new lang_string('cleanupdesc', 'tool_lockstats'),
-            '30'));
+            86400*30, 86400));
 
         $settings->add(new admin_setting_configtextarea('tool_lockstats/blacklist',
             new lang_string('blacklist',     'tool_lockstats'),
             new lang_string('blacklistdesc', 'tool_lockstats'),
             'core_cron'));
 
-        $settings->add(new admin_setting_configtext('tool_lockstats/threshold',
+        $settings->add(new admin_setting_configduration('tool_lockstats/threshold',
            new lang_string('threshold',     'tool_lockstats'),
            new lang_string('thresholddesc', 'tool_lockstats'),
-           '60'));
+           60*5, 60));
 
         $settings->add(new admin_setting_configcheckbox('tool_lockstats/debug',
             new lang_string('debug',        'tool_lockstats'),
