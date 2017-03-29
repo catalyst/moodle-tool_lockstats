@@ -54,6 +54,7 @@ class reset extends moodleform {
 
         $html  = html_writer::start_div('warning');
         $html .= $OUTPUT->notification($warningmsg, 'warning');
+        $html .= html_writer::empty_tag('br');
         $html .= html_writer::end_div();
 
         $mform->addElement('html', $html);

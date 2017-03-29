@@ -61,4 +61,10 @@ echo html_writer::empty_tag('br');
 echo html_writer::tag('h1', get_string('h1_nexttask', 'tool_lockstats'));
 echo html_writer::table($tasks);
 
+$reseturl = new moodle_url("/$CFG->admin/tool/lockstats/historyreset.php");
+$resettext = get_string('reset_text', 'tool_lockstats');
+
+echo html_writer::empty_tag('br');
+echo html_writer::link($reseturl, $resettext);
+
 echo $OUTPUT->footer();
