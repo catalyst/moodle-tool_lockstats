@@ -172,17 +172,14 @@ class proxy_lock_factory implements lock_factory {
 
         $lock = array_pop($this->openlocks[$proxylock->get_key()]);
 
-        $status = $this->proxiedlockfactory->release_lock($lock);
+        $lock->release();
 
-        if ($status) {
-            if ($this->debug) {
-                mtrace('tool_lockstats [lock released]: ' . $task);
-            }
-
-            $this->log_unlock($task);
+        if ($this->debug) {
+            mtrace('tool_lockstats [lock released]: ' . $task);
         }
 
-        $lock->release();
+        $this->log_unlock($task);
+
         unset($lock);
 
         return true;
