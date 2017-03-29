@@ -49,7 +49,7 @@ class locks extends html_table {
 
         $this->attributes['class'] = 'admintable generaltable';
 
-        $headers = [get_string('table_resource', 'tool_lockstats')];
+        $headers = [get_string('table_task', 'tool_lockstats')];
         $rows = [];
 
         $records = $this->get_current_locks();

@@ -47,17 +47,18 @@ if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstat
 echo $OUTPUT->header();
 
 // Current locks.
-echo html_writer::tag('h1', 'Current Locks');
+echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats'));
 echo html_writer::table($current);
 echo html_writer::empty_tag('br');
 
 // The Previous N locks.
-echo html_writer::tag('h1', 'Lock History');
+$a = get_config('tool_lockstats', 'threshold');
+echo html_writer::tag('h1', get_string('h1_history', 'tool_lockstats', $a));
 $history->out(10, false);
 echo html_writer::empty_tag('br');
 
 // A list of tasks with history, the ability to select one and see its history filtered.
-echo html_writer::tag('h1', 'Task Details');
+echo html_writer::tag('h1', get_string('h1_detail', 'tool_lockstats'));
 echo html_writer::table($tasks);
 
 echo $OUTPUT->footer();
