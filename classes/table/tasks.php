@@ -141,7 +141,7 @@ class tasks extends html_table {
     }
 
     /**
-     * Returns the record of the most recent history entry for the task.
+     * Returns a record of the if history exists for this task.
      *
      * @param string $task
      * @return false|stdClass
