@@ -51,5 +51,6 @@ $string['table_pid'] = 'PID';
 $string['table_released'] = 'Time released';
 $string['table_resource'] = 'Resource';
 $string['table_task'] = 'Task';
+$string['task_cleanup'] = 'Cleanup lockstats history';
 $string['threshold'] = 'History threshold';
 $string['thresholddesc'] = 'Only log new history entries when the cron task time exceeds this value.';

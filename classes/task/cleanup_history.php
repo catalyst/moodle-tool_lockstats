@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Proxy lock factory, task to clean history.
  *
  * @package    tool_lockstats
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,13 +23,43 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_lockstats\task;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$plugin->version   = 2017033001;
-$plugin->release   = 2017031500;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
-$plugin->component = 'tool_lockstats';
+/**
+ * Proxy lock factory, task to clean history.
+ *
+ * @package    tool_lockstats
+ * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
+ * @copyright  2017 Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class cleanup_history extends \core\task\scheduled_task {
+    /**
+     * {@inheritDoc}
+     * @see \core\task\scheduled_task::get_name()
+     */
+    public function get_name() {
+        return get_string('task_cleanup', 'tool_lockstats');
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \core\task\task_base::execute()
+     */
+    public function execute() {
+        global $DB;
+
+        $cleanup = get_config('tool_lockstats', 'cleanup');
+
+        $select = 'released < :released';
+        $params = ['released' => time() - $cleanup];
+
+        $DB->delete_records_select('tool_lockstats_history', $select, $params);
+    }
+
+}
+

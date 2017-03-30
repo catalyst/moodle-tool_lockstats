@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Proxy lock factory, tasks.
  *
  * @package    tool_lockstats
  * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
@@ -23,13 +23,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$plugin->version   = 2017033001;
-$plugin->release   = 2017031500;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
-$plugin->component = 'tool_lockstats';
+$tasks = array(
+    array(
+        'classname' => 'tool_lockstats\task\cleanup_history',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '3',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);
