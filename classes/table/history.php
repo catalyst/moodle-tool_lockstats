@@ -110,7 +110,7 @@ class history extends table_sql {
             return $values->gained;
         }
 
-        return userdate($values->gained, '%Y-%m-%d %H:%M:%S');
+        return userdate($values->gained, '%Y-%m-%d %H:%M:%S', 99, false, false);
     }
 
     /**
@@ -124,7 +124,7 @@ class history extends table_sql {
             return $values->released;
         }
 
-        return userdate($values->released, '%Y-%m-%d %H:%M:%S');
+        return userdate($values->released, '%Y-%m-%d %H:%M:%S', 99, false, false);
     }
 
     /**
