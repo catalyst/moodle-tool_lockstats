@@ -95,7 +95,7 @@ class locks extends html_table {
         global $DB;
 
         // Return the longest running locks in a descending order.
-        $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained DESC');
+        $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained ASC');
 
         return $records;
     }
