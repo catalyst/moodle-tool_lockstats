@@ -314,7 +314,11 @@ class proxy_lock_factory implements lock_factory {
 
         $history = $this->get_recent_history($record->id);
 
-        if ($history) {
+        $threshold = get_config('tool_lockstats', 'threshold');
+
+        // Only aggregate the previous log if the total duration is less than the threshold.
+        // Otherwise we will make a new
+        if ($history && $history->duration < $threshold) {
             $history->lockcount += 1;
             $history->gained = $record->gained;
             $history->released = time();
