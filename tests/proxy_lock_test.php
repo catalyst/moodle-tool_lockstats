@@ -36,7 +36,7 @@ if (!defined('MOODLE_INTERNAL')) {
  * @copyright  2017 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lock_testcase extends advanced_testcase {
+class proxy_lock_testcase extends advanced_testcase {
     /**
      * Clean up the database.
      */
