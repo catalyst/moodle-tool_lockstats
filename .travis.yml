@@ -19,37 +19,37 @@ addons:
   postgresql: "9.3"
 
 env:
-  - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=postgres_lock_factory
-  - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=postgres_lock_factory
-  - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=postgres_lock_factory
-  - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=postgres_lock_factory
-  - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=postgres_lock_factory
-  - DB=pgsql MOODLE_BRANCH=master LOCKFACTORY=postgres_lock_factory
-  - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
-  - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
-  - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE LOCKFACTORY=db_record_lock_factory
-  - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE LOCKFACTORY=db_record_lock_factory
-  - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=db_record_lock_factory
-  - DB=mysqli MOODLE_BRANCH=master LOCKFACTORY=db_record_lock_factory
+  - DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_30_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_31_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE
+  - DB=pgsql MOODLE_BRANCH=master
+  - DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_30_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_31_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE
+  - DB=mysqli MOODLE_BRANCH=master
 
 matrix:
   exclude:
     - php: 5.5
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=db_record_lock_factory
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_32_STABLE
     - php: 5.5
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE LOCKFACTORY=postgres_lock_factory
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_32_STABLE
     - php: 5.5
-      env: DB=mysqli MOODLE_BRANCH=master LOCKFACTORY=db_record_lock_factory
+      env: DB=mysqli MOODLE_BRANCH=master
     - php: 5.5
-      env: DB=pgsql MOODLE_BRANCH=master LOCKFACTORY=postgres_lock_factory
+      env: DB=pgsql MOODLE_BRANCH=master
     - php: 7.0
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=db_record_lock_factory
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_27_STABLE
     - php: 7.0
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE LOCKFACTORY=postgres_lock_factory
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_27_STABLE
     - php: 7.0
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=db_record_lock_factory
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_29_STABLE
     - php: 7.0
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE LOCKFACTORY=postgres_lock_factory
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini
@@ -60,8 +60,6 @@ before_install:
 
 install:
   - moodle-plugin-ci install -vvv
-  - moodle-plugin-ci add-config '$CFG->phpunit_lock_factory = "\\tool_lockstats\\proxy_lock_factory";'
-  - moodle-plugin-ci add-config "\$CFG->phpunit_proxied_lock_factory = \"\\core\\lock\\${LOCKFACTORY}\";"
 
 script:
   - moodle-plugin-ci phplint

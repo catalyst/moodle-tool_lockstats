@@ -41,10 +41,17 @@ class proxy_lock_testcase extends advanced_testcase {
      * Clean up the database.
      */
     protected function setUp() {
-        global $CFG;
+        global $CFG, $DB;
 
-        $CFG->lock_factory = $CFG->phpunit_lock_factory;
-        $CFG->proxied_lock_factory = $CFG->phpunit_proxied_lock_factory;
+        $dbtype = clean_param($DB->get_dbfamily(), PARAM_ALPHA);
+
+        $lockfactoryclass = "\\core\\lock\\${dbtype}_lock_factory";
+        if (!class_exists($lockfactoryclass)) {
+            $lockfactoryclass = '\core\lock\file_lock_factory';
+        }
+
+        $CFG->proxied_lock_factory = $lockfactoryclass;
+        $CFG->lock_factory = "\\tool_lockstats\\proxy_lock_factory";
 
         $this->resetAfterTest(true);
     }
