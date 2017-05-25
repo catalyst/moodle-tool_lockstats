@@ -65,6 +65,8 @@ class proxy_lock_factory implements lock_factory {
     public function __construct($type) {
         global $CFG;
 
+        $this->reset_running_tasks();
+
         $this->debug = get_config('tool_lockstats', 'debug');
 
         $this->type = $type;
@@ -355,6 +357,23 @@ class proxy_lock_factory implements lock_factory {
         $record = $DB->get_record_sql($sql, $params);
 
         return $record;
+    }
+
+    /**
+     * If the database has been refreshed from another instance, existing running tasks may be orphaned.
+     *
+     * This compares the current wwwroot with a saved value, if they differ then it will reset the current tasks.
+     */
+    private function reset_running_tasks() {
+        global $CFG, $DB;
+
+        $wwwroot = get_config('tool_lockstats', 'wwwroot');
+
+        if ($CFG->wwwroot !== $wwwroot) {
+            $DB->delete_records('tool_lockstats_locks');
+            set_config('wwwroot', $CFG->wwwroot, 'tool_lockstats');
+        }
+
     }
 
 }
