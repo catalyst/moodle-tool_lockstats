@@ -11,7 +11,7 @@ history of how long each task has taken in the past.
 
 It implements a proxy lock factory which adds instrumentation around the real lock factory.
 It will log details about each cron task when a lock is obtained and released.
-This is the data  that is obtained,
+This is the data that is obtained:
 
 - Task name
 - Duration
@@ -20,17 +20,25 @@ This is the data  that is obtained,
 - Time released
 - PID
 
+Most of the time, most cron tasks are quick and finish in seconds. These typically are not the
+tasks you are interesting in the history off. So this plugin compresses the history quick tasks
+so you still get overall stats for all tasks, and detailed stats for slower bigger tasks, and
+without bloating out the database with too much data. Old stats can be removed after a set
+time period too.
+
 # Installation
 
 Install the plugin the same as any standard moodle plugin either via the Moodle plugin directory, or you can use git to clone it into your source:
 
+```sh
 git clone git@github.com:catalyst/moodle-tool_lockstats.git admin/tool/lockstats
+```
 
 # Configuration
 
 This is an example of using the Postgres lock factory, add this to your config.php:
 
-```
+```php
 $CFG->lock_factory = "\\tool_lockstats\\proxy_lock_factory";
 $CFG->proxied_lock_factory = "\\core\\lock\\postgres_lock_factory";
 
