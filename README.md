@@ -28,9 +28,15 @@ time period too.
 
 # Installation
 
-Install the plugin the same as any standard moodle plugin either via the Moodle plugin directory, or you can use git to clone it into your source:
+Install the plugin the same as any standard moodle plugin either via the Moodle plugin directory:
 
-```sh
+https://moodle.org/plugins/tool_lockstats
+
+https://docs.moodle.org/en/Installing_plugins
+
+OR you can use git to clone it into your source:
+
+```bash
 git clone git@github.com:catalyst/moodle-tool_lockstats.git admin/tool/lockstats
 ```
 
