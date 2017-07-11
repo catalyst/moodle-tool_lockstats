@@ -83,7 +83,7 @@ class tasks extends html_table {
             $history = $this->task_has_history($key);
 
             if ($history) {
-                $url = new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $history->taskid]);
+                $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $history->taskid]);
                 $link = html_writer::link($url, $task->get_name());
             } else {
                 $link = $task->get_name();
