@@ -36,7 +36,7 @@ $taskid = required_param('task', PARAM_ALPHANUM);
 
 $download = optional_param('download', '', PARAM_ALPHA);
 
-$baseurl = new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $taskid]);
+$baseurl = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $taskid]);
 
 $PAGE->navbar->add(get_string('h1_detail', 'tool_lockstats'));
 

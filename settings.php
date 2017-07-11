@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 if ($hassiteconfig) {
-    $url = new moodle_url("/$CFG->admin/tool/lockstats");
+    $url = new moodle_url("/admin/tool/lockstats");
     $ADMIN->add('server', new admin_externalpage('tool_lockstats', get_string('pluginname', 'tool_lockstats'), $url));
 
     // Local plugin settings.
