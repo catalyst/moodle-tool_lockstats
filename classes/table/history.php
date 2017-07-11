@@ -163,7 +163,7 @@ class history extends table_sql {
             return $values->task;
         }
 
-        $url = new moodle_url("/$CFG->admin/tool/lockstats/detail.php", ['task' => $values->taskid]);
+        $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $values->taskid]);
         $link = html_writer::link($url, $values->task);
 
         return $link;
