@@ -68,10 +68,6 @@ class tasks extends html_table {
 
         $tasks = \core\task\manager::get_all_scheduled_tasks();
 
-        usort($tasks, function($a, $b) {
-            return $b->get_last_run_time() - $a->get_last_run_time();
-        });
-
         $never = get_string('never');
         $asap = get_string('asap', 'tool_task');
         $disabledstr = get_string('taskdisabled', 'tool_task');
@@ -108,18 +104,22 @@ class tasks extends html_table {
                 }
             }
 
-            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time(), '%a, %e %b %G %l:%M %p') : $never;
+            $lastrun = $task->get_last_run_time() ? userdate($task->get_last_run_time(), '%e %b %l:%M%P') : $never;
             $nextrun = $task->get_next_run_time();
             $disabled = false;
 
+            $nextruntime = $nextrun;
             if ($plugininfo && $plugininfo->is_enabled() === false && !$task->get_run_if_component_disabled()) {
+                $nextruntime = 10000000001; # Force these to the bottom of the table.
                 $disabled = true;
                 $nextrun = $plugindisabledstr;
             } else if ($task->get_disabled()) {
+                $nextruntime = 10000000000; # Force these to the bottom of the table.
                 $disabled = true;
                 $nextrun = $disabledstr;
             } else if ($nextrun > time()) {
-                $nextrun = userdate($nextrun, '%a, %e %b %G %l:%M %p');
+                // $nextruntime = $nextrun;
+                $nextrun = userdate($nextrun, '%e %b %l:%M%P');
             } else {
                 $nextrun = $asap;
             }
@@ -134,8 +134,16 @@ class tasks extends html_table {
             if ($disabled) {
                 $row->attributes['class'] = 'disabled';
             }
+            $row->attributes['nextruntime'] = $nextruntime;
             $data[] = $row;
         }
+
+        usort($data, function($a, $b) {
+            // return $b->get_last_run_time() - $a->get_last_run_time();
+            $at = $a->attributes['nextruntime'];
+            $bt = $b->attributes['nextruntime'];
+            return $at - $bt;
+        });
 
         $this->data = $data;
     }
