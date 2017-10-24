@@ -45,6 +45,10 @@ if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstat
 
 echo $OUTPUT->header();
 
+if ($CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
+    echo $OUTPUT->notification(get_string('errornolockfactory','tool_lockstats'), 'error');
+}
+
 // Current locks.
 echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats'));
 echo html_writer::table($current);

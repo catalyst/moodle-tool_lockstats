@@ -34,6 +34,7 @@ $string['cleanup'] = 'Cleanup history';
 $string['cleanupdesc'] = 'Automatically prune the history table after this value.';
 $string['debug'] = 'Debug';
 $string['debugdesc'] = 'Print additional helpful debug output in the cron.log';
+$string['errornolockfactory'] = 'Error: The lock_factory is not configured properly in config.php:<br>$CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory;';
 $string['form_reset_button'] = 'Reset lock history';
 $string['form_reset_warning'] = 'Warning. You are about to reset the lock statistics history. Are you sure you want to do this?';
 $string['h1_current'] = 'Current running tasks';
