@@ -110,11 +110,11 @@ class tasks extends html_table {
 
             $nextruntime = $nextrun;
             if ($plugininfo && $plugininfo->is_enabled() === false && !$task->get_run_if_component_disabled()) {
-                $nextruntime = 10000000001; # Force these to the bottom of the table.
+                $nextruntime = 10000000001; // Force these to the bottom of the table.
                 $disabled = true;
                 $nextrun = $plugindisabledstr;
             } else if ($task->get_disabled()) {
-                $nextruntime = 10000000000; # Force these to the bottom of the table.
+                $nextruntime = 10000000000; // Force these to the bottom of the table.
                 $disabled = true;
                 $nextrun = $disabledstr;
             } else if ($nextrun > time()) {
