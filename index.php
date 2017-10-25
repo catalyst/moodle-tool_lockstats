@@ -54,9 +54,9 @@ echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats'));
 echo html_writer::table($current);
 echo html_writer::empty_tag('br');
 
-// The Previous N locks.
+// The heaviest locks.
 $a = get_config('tool_lockstats', 'threshold');
-echo html_writer::tag('h1', get_string('h1_history', 'tool_lockstats', $a));
+echo html_writer::tag('h1', get_string('h1_slowest', 'tool_lockstats', $a));
 $history->out(10, false);
 echo html_writer::empty_tag('br');
 

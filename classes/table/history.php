@@ -59,13 +59,8 @@ class history extends table_sql {
         parent::__construct('tool_lockstats_history' . $id);
 
         $columns = array(
-            'task'      => get_string('table_task', 'tool_lockstats'),
             'duration'  => get_string('table_duration', 'tool_lockstats'),
-            'lockcount' => get_string('table_lockcount', 'tool_lockstats'),
-            'host'      => get_string('table_host', 'tool_lockstats'),
-            'gained'    => get_string('table_gained', 'tool_lockstats'),
-            'released'  => get_string('table_released', 'tool_lockstats'),
-            'pid'       => get_string('table_pid', 'tool_lockstats'),
+            'task'      => get_string('table_task', 'tool_lockstats'),
         );
 
         $this->define_columns(array_keys($columns));
@@ -76,7 +71,7 @@ class history extends table_sql {
         $this->set_attribute('class', 'generaltable admintable');
         $this->set_attribute('cellspacing', '0');
 
-        $this->sortable(true, 'released', SORT_DESC);
+        $this->sortable(true, 'duration', SORT_DESC);
 
         $this->collapsible(false);
 
@@ -84,9 +79,23 @@ class history extends table_sql {
         $this->show_download_buttons_at([TABLE_P_BOTTOM]);
 
         $select = '*';
-        $from = '{tool_lockstats_history}';
-        $where = 'duration > 0 AND lockcount > 0 AND (duration / lockcount) > :threshold';
-        $params = ['threshold' => get_config('tool_lockstats', 'threshold')];
+        $from = '(
+          SELECT max(id) id,
+                 max(taskid) taskid,
+                 task,
+                 max(duration / lockcount) duration
+            FROM {tool_lockstats_history}
+           WHERE duration > 0
+             AND lockcount > 0
+             AND (duration / lockcount) > :threshold
+             AND released > :releasedafter
+        GROUP BY task
+        ) sub';
+        $where = ' 1 = 1 ';
+        $params = [
+            'threshold'  => get_config('tool_lockstats', 'threshold'),
+            'releasedafter'  => time() - 7 * 24 * 60 * 60,
+        ];
 
         $this->set_sql($select, $from, $where, $params);
     }
@@ -101,33 +110,6 @@ class history extends table_sql {
         $this->out($total, false);
     }
 
-    /**
-     * The time the lock was gained.
-     *
-     * @param stdClass $values
-     * @return string
-     */
-    public function col_gained($values) {
-        if ($this->is_downloading()) {
-            return $values->gained;
-        }
-
-        return userdate($values->gained, '%e %b %l:%M:%S%P', 99, false, false);
-    }
-
-    /**
-     * The time the lock was released.
-     *
-     * @param stdClass $values
-     * @return string
-     */
-    public function col_released($values) {
-        if ($this->is_downloading()) {
-            return $values->released;
-        }
-
-        return userdate($values->released, '%e %b %l:%M:%S%P', 99, false, false);
-    }
 
     /**
      * The time the lock was held for.
@@ -163,7 +145,10 @@ class history extends table_sql {
             return $values->task;
         }
 
-        $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $values->taskid]);
+        $url = new moodle_url("/admin/tool/lockstats/detail.php", [
+            'task' => $values->taskid,
+            'tsort' => 'duration',
+        ]);
         $link = html_writer::link($url, $values->task);
 
         return $link;
