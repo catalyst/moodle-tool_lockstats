@@ -139,7 +139,6 @@ class history extends table_sql {
      * @return string
      */
     public function col_task($values) {
-        global $CFG;
 
         if ($this->is_downloading()) {
             return $values->task;
