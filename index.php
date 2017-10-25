@@ -46,7 +46,7 @@ if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstat
 echo $OUTPUT->header();
 
 if ($CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
-    echo $OUTPUT->notification(get_string('errornolockfactory','tool_lockstats'), 'error');
+    echo $OUTPUT->notification(get_string('errornolockfactory', 'tool_lockstats'), 'error');
 }
 
 // Current locks.
