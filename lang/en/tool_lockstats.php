@@ -42,6 +42,7 @@ $string['h1_detail'] = 'Task Details';
 $string['h1_slowest'] = 'Slowest tasks this week with a duration > {$a} seconds';
 $string['h1_nexttask'] = 'Next running tasks';
 $string['pluginname'] = 'Cron Lock statistics';
+$string['privacy:metadata'] = 'Cron Lock statistics plugin does not store any personal data.';
 $string['reset_header'] = 'Reset lock statistics history';
 $string['reset_text'] = 'Reset the lock stastics history.';
 $string['table_duration'] = 'Average Duration';
