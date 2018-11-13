@@ -118,8 +118,16 @@ class history extends table_sql {
      * @return string
      */
     public function col_duration($values) {
-        $lockcount = $values->lockcount;
-        $duration = $values->duration;
+        $lockcount = null;
+        $duration = null;
+
+        if (isset($values->lockcount)) {
+            $lockcount = $values->lockcount;
+        }
+
+        if (isset($values->duration)) {
+            $duration = $values->duration;
+        }
 
         if ($lockcount > 0) {
             $duration = sprintf('%.4f', $values->duration / $values->lockcount);

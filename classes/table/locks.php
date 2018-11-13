@@ -53,14 +53,20 @@ class locks extends html_table {
         $rows = [];
 
         $records = $this->get_current_locks();
+        $hosts = [];
 
         // Create a dynamic list of headers from the current open locks.
         foreach ($records as $record) {
-            $headers[$record->host] = $record->host;
+            $hosts[$record->host] = $record->host;
         }
 
         // This is a list of hostnames, sorting them looks nice.
-        sort($headers);
+        sort($hosts);
+
+        // Header is first column in table, then the sorted hostnames come next.
+        foreach ($hosts as $value) {
+            array_push($headers, $value);
+        }
 
         foreach ($records as $record) {
             // The first column is the task key.
