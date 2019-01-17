@@ -34,7 +34,8 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         $lockstable = new xmldb_table('tool_lockstats_locks');
         $historytable = new xmldb_table('tool_lockstats_history');
 
-        $field = new xmldb_field('task', XMLDB_TYPE_CHAR);
+        $field = new xmldb_field('task');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, null, null, null);
         // Update task column to use CHAR instead of TEXT.
         $dbman->change_field_type($lockstable, $field, $continue = true, $feedback = true);
         $dbman->change_field_type($historytable, $field, $continue = true, $feedback = true);
