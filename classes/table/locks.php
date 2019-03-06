@@ -72,6 +72,13 @@ class locks extends html_table {
             // The first column is the task key.
             $data = [$record->task];
 
+            $adhocid = $this->get_adhoc_id_by_task($record->task);
+            if ($adhocid != null) {
+                $adhocrecord = $this->get_adhoc_record($adhocid);
+                $adhoctask = \core\task\manager::adhoc_task_from_record($adhocrecord);
+                $data = [$record->task. ' => ' . $adhoctask->get_name() . ' => ' . $adhocrecord->classname];
+            }
+
             // Add null data for the number of hosts that exist.
             for ($i = 1; $i < count($headers); $i++) {
                 $data[] = '';
@@ -104,5 +111,31 @@ class locks extends html_table {
         $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained ASC');
 
         return $records;
+    }
+
+    /**
+     * Get adhoc record by id.
+     *
+     * @return object
+     */
+    private function get_adhoc_record($adhocid) {
+        global $DB;
+        return $DB->get_record('task_adhoc', array('id' => $adhocid));
+    }
+
+    /**
+     * Extract id of adhoc task
+     *
+     * @return id of adhoc task
+     */
+    private function get_adhoc_id_by_task($task) {
+        preg_match(" /^adhoc_(\d+)$/", $task, $results);
+
+        if (count($results) > 0) {
+            return $results[1];
+        } else {
+            return null;
+        }
+
     }
 }
