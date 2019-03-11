@@ -137,11 +137,11 @@ class proxy_lock_factory implements lock_factory {
      *                       a lock when a process ends.
      * @return lock|boolean - An instance of \core\lock\lock if the lock was obtained, or false.
      */
-    public function get_lock($task, $timeout, $maxlifetime = 86400) {
-        $lock = $this->proxiedlockfactory->get_lock($task, $timeout, $maxlifetime);
+    public function get_lock($resourcekey, $timeout, $maxlifetime = 86400) {
+        $lock = $this->proxiedlockfactory->get_lock($resourcekey, $timeout, $maxlifetime);
 
         if ($lock) {
-            $proxylock = new lock($task, $this);
+            $proxylock = new lock($resourcekey, $this);
 
             $this->openlocks[$proxylock->get_key()][] = $lock;
 
@@ -164,7 +164,7 @@ class proxy_lock_factory implements lock_factory {
      * @return boolean - True if the lock is no longer held (including if it was never held).
      */
     public function release_lock(lock $proxylock) {
-        $task = $proxylock->get_key();
+        $resourcekey = $proxylock->get_key();
 
         $this->openlocks[$proxylock->get_key()];
 
@@ -173,10 +173,10 @@ class proxy_lock_factory implements lock_factory {
         $lock->release();
 
         if ($this->debug) {
-            mtrace('tool_lockstats [lock released]: ' . $task);
+            mtrace('tool_lockstats [lock released]: ' . $resourcekey);
         }
 
-        $this->log_unlock($task);
+        $this->log_unlock($resourcekey);
 
         unset($lock);
 
@@ -212,34 +212,33 @@ class proxy_lock_factory implements lock_factory {
     }
 
     /**
-     * Log information from the $task to the current lock table. This is for when a lock is gained.
+     * Log information from the $resourcekey to the current lock table. This is for when a lock is gained.
      *
-     * @param string $task
+     * @param string $resourcekey
      * @return false|stdClass
      */
-    private function log_lock($task) {
+    private function log_lock($resourcekey) {
         global $DB;
 
-        $params = ['task' => $task];
+        $params = ['resourcekey' => $resourcekey];
 
-        $select = $DB->sql_compare_text('task') . ' = ' . $DB->sql_compare_text(':task');
+        $select = $DB->sql_compare_text('resourcekey') . ' = ' . $DB->sql_compare_text(':resourcekey');
 
         $record = $DB->get_record_select('tool_lockstats_locks', $select, $params);
 
         if (empty($record)) {
             $record = new stdClass();
-            $record->task = $task;
+            $record->resourcekey = $resourcekey;
             $record->gained = time();
             $record->host = gethostname();
             $record->pid = posix_getpid();
-
+            $record = $this->fill_more_for_tasks($record, $resourcekey);
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
             $record->gained = time();
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
-
             $DB->update_record('tool_lockstats_locks', $record);
         }
 
@@ -247,17 +246,17 @@ class proxy_lock_factory implements lock_factory {
     }
 
     /**
-     * Log information from the $task to the current lock table. This is for when a lock is released.
+     * Log information from the $resourcekey to the current lock table. This is for when a lock is released.
      *
-     * @param string $task
+     * @param string $resourcekey
      * @return bool
      */
-    private function log_unlock($task) {
+    private function log_unlock($resourcekey) {
         global $DB;
 
-        $select = $DB->sql_compare_text('task') . ' = ' . $DB->sql_compare_text(':task');
+        $select = $DB->sql_compare_text('resourcekey') . ' = ' . $DB->sql_compare_text(':resourcekey');
 
-        $params = ['task' => $task];
+        $params = ['resourcekey' => $resourcekey];
 
         $record = $DB->get_record_select('tool_lockstats_locks', $select, $params);
 
@@ -272,7 +271,7 @@ class proxy_lock_factory implements lock_factory {
             // Prevent logging tasks that exist in the blacklist.
             $blacklist = get_config('tool_lockstats', 'blacklist');
             foreach (explode(PHP_EOL, $blacklist) as $item) {
-                if ($item == $task) {
+                if ($item == $resourcekey) {
                     if ($this->debug) {
                         mtrace('tool_lockstats [history blacklist]: ' . $item);
                     }
@@ -374,6 +373,35 @@ class proxy_lock_factory implements lock_factory {
             set_config('wwwroot', $CFG->wwwroot, 'tool_lockstats');
         }
 
+    }
+
+    /**
+     * Fill in more data for adhoc and scheduled tasks
+     * @param stdClass $record
+     * @param stdClass $record
+     * @return stdClass $records to insert for adhoc and scheduled tasks
+     */
+    private function fill_more_for_tasks($record, $resourcekey) {
+        global $DB;
+
+        $adhocid = \tool_lockstats\table\locks::get_adhoc_id_by_task($resourcekey);
+        if ($adhocid != null) {
+            $adhocparams = ['id' => $adhocid];
+            $adhocselect = $DB->sql_compare_text('id') . ' = ' . $DB->sql_compare_text(':id');
+            $adhocrecord = $DB->get_record_select('task_adhoc', $adhocselect, $adhocparams);
+            $record->classname = $adhocrecord->classname;
+            $record->customdata = $adhocrecord->customdata;
+        } else {
+            $scheduledparams = ['classname' => $resourcekey];
+            $scheduledselect = $DB->sql_compare_text('classname') . ' = ' . $DB->sql_compare_text(':classname');
+            $scheduledrecord = $DB->get_record_select('task_scheduled', $scheduledselect, $scheduledparams);
+            if (!empty($scheduledrecord)) {
+                $record->classname = $resourcekey;
+                $record->component = $scheduledrecord->component;
+            }
+        }
+
+        return $record;
     }
 
 }

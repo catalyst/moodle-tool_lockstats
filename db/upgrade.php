@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_tool_lockstats_upgrade($oldversion) {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -46,6 +46,54 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
             $dbman->add_index($lockstable, $index);
         }
         upgrade_plugin_savepoint(true, 2019011600, 'tool', 'lockstats');
+    }
+
+    if ($oldversion < 2019030700) {
+        $lockstable = new xmldb_table('tool_lockstats_locks');
+        $historytable = new xmldb_table('tool_lockstats_history');
+
+        $taskfield = new xmldb_field('task', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'id');
+        $index = new xmldb_index('task', XMLDB_INDEX_NOTUNIQUE, array('task'));
+        $newindex = new xmldb_index('resourcekey', XMLDB_INDEX_NOTUNIQUE, array('resourcekey'));
+        $compoentfield = new xmldb_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'resourcekey');
+        $classnamefield = new xmldb_field('classname', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'component');
+        $customdatafield = new xmldb_field('customdata', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'pid');
+        $historytaskfield = new xmldb_field('task', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'taskid');
+        $historycomponentfield = new xmldb_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'taskid');
+
+        // Launch rename index task to resourcekey.
+        $dbman->drop_index($lockstable, $index, true, true);
+        // Launch rename field task.
+        $dbman->rename_field($lockstable, $taskfield, 'resourcekey');
+        // Conditionally launch add field component.
+        if (!$dbman->field_exists($lockstable, $compoentfield)) {
+            $dbman->add_field($lockstable, $compoentfield);
+        }
+        $dbman->add_index($lockstable, $newindex, true, true);
+        // Conditionally launch add field classname.
+        if (!$dbman->field_exists($lockstable, $classnamefield)) {
+            $dbman->add_field($lockstable, $classnamefield);
+        }
+        // Conditionally launch add field customdata.
+        if (!$dbman->field_exists($lockstable, $customdatafield)) {
+            $dbman->add_field($lockstable, $customdatafield);
+        }
+        // Launch rename field task.
+        $dbman->rename_field($historytable, $historytaskfield, 'classname');
+        // Conditionally launch add field component.
+        if (!$dbman->field_exists($historytable, $historycomponentfield)) {
+            $dbman->add_field($historytable, $historycomponentfield);
+        }
+
+        // Keep other task names but not adhoc tasks since old data in the field is not adhoc task name.
+        $DB->execute('UPDATE {tool_lockstats_locks} SET classname = resourcekey WHERE ' . $DB->sql_like('resourcekey', ':resourcek'), array('resourcek' => 'adhoc_%') );
+        // Fill in components for scheduled tasks.
+        $updatelockssql = 'UPDATE {tool_lockstats_locks} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_locks}.resourcekey';
+        $DB->execute($updatelockssql);
+        $updatehistorysql = 'UPDATE {tool_lockstats_history} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_history}.classname';
+        $DB->execute($updatehistorysql);
+
+        upgrade_plugin_savepoint(true, 2019030700, 'tool', 'lockstats');
     }
 
     return true;

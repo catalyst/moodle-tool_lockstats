@@ -85,7 +85,8 @@ class tasks extends html_table {
                 $link = $task->get_name();
             }
 
-            $namecell = new html_table_cell($link . "\n" . html_writer::tag('span', '\\'.get_class($task), ['class' => 'task-class']));
+            $text = $link . "\n" . html_writer::tag('span', '\\'.get_class($task), ['class' => 'task-class']);
+            $namecell = new html_table_cell($text);
             $namecell->header = true;
 
             $component = $task->get_component();
@@ -118,7 +119,6 @@ class tasks extends html_table {
                 $disabled = true;
                 $nextrun = $disabledstr;
             } else if ($nextrun > time()) {
-                // $nextruntime = $nextrun;
                 $nextrun = userdate($nextrun, '%e %b %l:%M%P');
             } else {
                 $nextrun = $asap;
@@ -139,7 +139,6 @@ class tasks extends html_table {
         }
 
         usort($data, function($a, $b) {
-            // return $b->get_last_run_time() - $a->get_last_run_time();
             $at = $a->attributes['nextruntime'];
             $bt = $b->attributes['nextruntime'];
             return $at - $bt;
@@ -160,7 +159,7 @@ class tasks extends html_table {
         $params = ['task' => $task];
         $sql = "SELECT *
                   FROM {tool_lockstats_history} his
-                 WHERE task = :task
+                 WHERE classname = :task
                  LIMIT 1";
 
         $record = $DB->get_record_sql($sql, $params);

@@ -60,7 +60,7 @@ class history extends table_sql {
 
         $columns = array(
             'duration'  => get_string('table_duration', 'tool_lockstats'),
-            'task'      => get_string('table_task', 'tool_lockstats'),
+            'classname'      => get_string('table_classname', 'tool_lockstats'),
         );
 
         $this->define_columns(array_keys($columns));
@@ -82,14 +82,14 @@ class history extends table_sql {
         $from = '(
           SELECT max(id) id,
                  max(taskid) taskid,
-                 task,
+                 classname,
                  max(duration / lockcount) duration
             FROM {tool_lockstats_history}
            WHERE duration > 0
              AND lockcount > 0
              AND (duration / lockcount) > :threshold
              AND released > :releasedafter
-        GROUP BY task
+        GROUP BY classname
         ) sub';
         $where = ' 1 = 1 ';
         $params = [
@@ -146,17 +146,17 @@ class history extends table_sql {
      * @param stdClass $values
      * @return string
      */
-    public function col_task($values) {
+    public function col_classname($values) {
 
         if ($this->is_downloading()) {
-            return $values->task;
+            return $values->taskid;
         }
 
         $url = new moodle_url("/admin/tool/lockstats/detail.php", [
             'task' => $values->taskid,
             'tsort' => 'duration',
         ]);
-        $link = html_writer::link($url, $values->task);
+        $link = html_writer::link($url, $values->taskid);
 
         return $link;
     }
