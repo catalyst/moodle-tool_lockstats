@@ -50,7 +50,7 @@ class tasks extends html_table {
      * Constructor
      */
     public function __construct() {
-        global $CFG;
+        global $DB;
 
         parent::__construct();
 
@@ -73,13 +73,16 @@ class tasks extends html_table {
         $disabledstr = get_string('taskdisabled', 'tool_task');
         $plugindisabledstr = get_string('plugindisabled', 'tool_task');
 
+        $sql = "SELECT classname, taskid
+                  FROM {tool_lockstats_history} his
+                 GROUP BY classname, taskid";
+        $historyall = $DB->get_records_sql_menu($sql);
+
         foreach ($tasks as $task) {
             $key = '\\' . get_class($task);
 
-            $history = $this->task_has_history($key);
-
-            if ($history) {
-                $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $history->taskid]);
+            if (array_key_exists($key, $historyall)) {
+                $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $historyall[$key]]);
                 $link = html_writer::link($url, $task->get_name());
             } else {
                 $link = $task->get_name();
@@ -145,25 +148,5 @@ class tasks extends html_table {
         });
 
         $this->data = $data;
-    }
-
-    /**
-     * Returns a record of the if history exists for this task.
-     *
-     * @param string $task
-     * @return false|stdClass
-     */
-    private function task_has_history($task) {
-        global $DB;
-
-        $params = ['task' => $task];
-        $sql = "SELECT *
-                  FROM {tool_lockstats_history} his
-                 WHERE classname = :task
-                 LIMIT 1";
-
-        $record = $DB->get_record_sql($sql, $params);
-
-        return $record;
     }
 }
