@@ -31,6 +31,8 @@ if (!defined('MOODLE_INTERNAL')) {
 
 use html_table;
 use html_table_row;
+use moodle_url;
+use html_writer;
 
 /**
  * Proxy lock factory, current list table.
@@ -49,7 +51,8 @@ class locks extends html_table {
 
         $this->attributes['class'] = 'admintable generaltable';
 
-        $headers = [get_string('table_task', 'tool_lockstats')];
+        $headers = [get_string('table_lock_key', 'tool_lockstats'),
+            get_string('table_classname', 'tool_lockstats')];
         $rows = [];
 
         $records = $this->get_current_locks();
@@ -70,15 +73,19 @@ class locks extends html_table {
 
         foreach ($records as $record) {
             // The first column is the resource key.
-            $data = [$record->resourcekey];
+            $url = new moodle_url("/admin/tool/lockstats/locks_detail.php", [
+                'resourcekey' => $record->resourcekey,
+            ]);
 
             $adhocid = $this::get_adhoc_id_by_task($record->resourcekey);
             if ($adhocid != null) {
                 $adhocrecord = $this->get_adhoc_record($adhocid);
-                $adhoctask = \core\task\manager::adhoc_task_from_record($adhocrecord);
-                $data = [$record->resourcekey. ' => ' . $adhoctask->get_name() . ' => ' . $adhocrecord->classname];
+                $link = html_writer::link($url, $record->resourcekey);
+                $data = [$link, $adhocrecord->classname];
+            } else {
+                $link = html_writer::link($url, $record->resourcekey);
+                $data = [$link, null];
             }
-
             // Add null data for the number of hosts that exist.
             for ($i = 1; $i < count($headers); $i++) {
                 $data[] = '';

@@ -156,7 +156,7 @@ class history extends table_sql {
             'task' => $values->taskid,
             'tsort' => 'duration',
         ]);
-        $link = html_writer::link($url, $values->taskid);
+        $link = html_writer::link($url, $values->classname);
 
         return $link;
     }
