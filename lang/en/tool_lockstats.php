@@ -52,6 +52,7 @@ $string['table_lockcount'] = 'Count';
 $string['table_pid'] = 'PID';
 $string['table_released'] = 'Time released';
 $string['table_classname'] = 'Class name';
+$string['table_lock_key'] = 'Lock key';
 $string['table_task'] = 'Task';
 $string['task_cleanup'] = 'Cleanup lockstats history';
 $string['threshold'] = 'History threshold';
