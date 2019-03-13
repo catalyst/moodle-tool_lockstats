@@ -73,9 +73,9 @@ class tasks extends html_table {
         $disabledstr = get_string('taskdisabled', 'tool_task');
         $plugindisabledstr = get_string('plugindisabled', 'tool_task');
 
-        $sql = "SELECT classname, taskid
+        $sql = "SELECT taskid, classname
                   FROM {tool_lockstats_history} his
-                 GROUP BY classname, taskid";
+                 GROUP BY taskid, classname";
         $historyall = $DB->get_records_sql_menu($sql);
 
         foreach ($tasks as $task) {
