@@ -65,12 +65,10 @@ class locks_detail extends table_sql {
         parent::__construct('tool_lockstats_locks_detail' . $id);
 
         $columns = array(
-            'resourcekey'  => get_string('table_lock_key', 'tool_lockstats'),
             'classname'  => get_string('table_classname', 'tool_lockstats'),
             'host'      => get_string('table_host', 'tool_lockstats'),
             'gained'    => get_string('table_gained', 'tool_lockstats'),
             'pid'       => get_string('table_pid', 'tool_lockstats'),
-            'customdata'       => get_string('table_custom_data', 'tool_lockstats'),
         );
 
         $this->define_columns(array_keys($columns));

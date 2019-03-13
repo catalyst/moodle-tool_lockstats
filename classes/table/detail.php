@@ -65,7 +65,6 @@ class detail extends table_sql {
         parent::__construct('tool_lockstats_detail' . $id);
 
         $columns = array(
-            'resourcekey'  => get_string('table_lock_key', 'tool_lockstats'),
             'classname'  => get_string('table_classname', 'tool_lockstats'),
             'duration'  => get_string('table_duration', 'tool_lockstats'),
             'lockcount' => get_string('table_lockcount', 'tool_lockstats'),
@@ -73,7 +72,6 @@ class detail extends table_sql {
             'gained'    => get_string('table_gained', 'tool_lockstats'),
             'released'  => get_string('table_released', 'tool_lockstats'),
             'pid'       => get_string('table_pid', 'tool_lockstats'),
-            'customdata'       => get_string('table_custom_data', 'tool_lockstats'),
         );
 
         $this->define_columns(array_keys($columns));
@@ -112,30 +110,6 @@ class detail extends table_sql {
 
         $total = $DB->count_records_sql($sql, $params);
         $this->out($total, false);
-    }
-
-    /**
-     * The lock key.
-     *
-     * @param stdClass $values
-     * @return string
-     */
-    public function col_resourcekey($values) {
-        global $DB;
-        $lock = $DB->get_record('tool_lockstats_locks', array('id' => $values->taskid), 'resourcekey', MUST_EXIST);
-        return $lock->resourcekey;
-    }
-
-    /**
-     * The custom data for adhoc task.
-     *
-     * @param stdClass $values
-     * @return string
-     */
-    public function col_customdata($values) {
-        global $DB;
-        $lock = $DB->get_record('tool_lockstats_locks', array('id' => $values->taskid), 'customdata', MUST_EXIST);
-        return $lock->customdata;
     }
 
     /**
