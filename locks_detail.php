@@ -32,6 +32,13 @@ require_capability('moodle/site:config', context_system::instance());
 admin_externalpage_setup('tool_lockstats');
 
 $resoucekey = required_param('resourcekey', PARAM_TEXT);
+$sessionkey = sesskey();
+
+$action = optional_param('action', '', PARAM_TEXT);
+
+if ($action == 'try') {
+    releaselock($resoucekey, $sessionkey);
+}
 
 $download = optional_param('download', '', PARAM_ALPHA);
 
@@ -44,5 +51,31 @@ $detail = new tool_lockstats\table\locks_detail($baseurl, $resoucekey);
 echo $OUTPUT->header();
 
 echo html_writer::tag('h1', get_string('h1_detail', 'tool_lockstats'));
+
+$url = new moodle_url("/admin/tool/lockstats/locks_detail.php",
+    array('resourcekey' => $resoucekey, 'sesskey' => sesskey(), 'action' => 'try'));
+
+echo $OUTPUT->single_button($url, get_string('release_lock', 'tool_lockstats'));
+
+if ($action == 'warn') {
+    echo $OUTPUT->notification(get_string('lock_in_use', 'tool_lockstats'), 'info');
+}
+
 $detail->out(50, false);
 echo $OUTPUT->footer();
+
+
+function releaselock($resourcekey, $sesskey) {
+    if (isset($resourcekey) && confirm_sesskey($sesskey)) {
+        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
+        $lock = $cronlockfactory->get_lock($resourcekey, 0);
+
+        if ($lock) {
+            $cronlockfactory->release_lock($lock);
+            $baseurl = new moodle_url('/admin/tool/lockstats/');
+        } else {
+            $baseurl = new moodle_url('/admin/tool/lockstats/locks_detail.php', array('resourcekey' => $resourcekey, 'action' => 'warn'));
+        }
+        redirect($baseurl);
+    }
+}
