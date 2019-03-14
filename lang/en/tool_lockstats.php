@@ -50,6 +50,7 @@ $string['reset_text'] = 'Reset the lock stastics history.';
 $string['table_duration'] = 'Average Duration';
 $string['table_gained'] = 'Time gained';
 $string['table_host'] = 'Last Host';
+$string['table_latency'] = 'Latency (seconds)';
 $string['table_lockcount'] = 'Count';
 $string['table_pid'] = 'PID';
 $string['table_released'] = 'Time released';

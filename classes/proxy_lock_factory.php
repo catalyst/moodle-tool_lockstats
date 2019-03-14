@@ -226,6 +226,11 @@ class proxy_lock_factory implements lock_factory {
 
         $record = $DB->get_record_select('tool_lockstats_locks', $select, $params);
 
+        preg_match(" /^adhoc_(\d+)$/", $resourcekey, $adhoc);
+        if (count($adhoc) > 0) {
+            $timequeued = $DB->get_record('task_adhoc', array('id' => $adhoc[1]), 'nextruntime');
+        }
+
         if (empty($record)) {
             $record = new stdClass();
             $record->resourcekey = $resourcekey;
@@ -233,12 +238,18 @@ class proxy_lock_factory implements lock_factory {
             $record->host = gethostname();
             $record->pid = posix_getpid();
             $record = $this->fill_more_for_tasks($record, $resourcekey);
+            if (isset($timequeued)) {
+                $record->latency = $record->gained - $timequeued->nextruntime;
+            }
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
             $record->gained = time();
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
+            if (isset($timequeued)) {
+                $record->latency = $record->gained - $timequeued->nextruntime;
+            }
             $DB->update_record('tool_lockstats_locks', $record);
         }
 
@@ -301,7 +312,6 @@ class proxy_lock_factory implements lock_factory {
         $record->duration = $record->released - $record->gained;
         $record->lockcount = 1;
         $record->taskid = $record->id;
-
         $DB->insert_record('tool_lockstats_history', $record);
     }
 
@@ -324,6 +334,11 @@ class proxy_lock_factory implements lock_factory {
             $history->gained = $record->gained;
             $history->released = time();
             $history->duration += $record->duration;
+
+            preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
+            if (count($adhoc) > 0) {
+                $history->latency += $history->latency;
+            }
 
             $DB->update_record('tool_lockstats_history', $history);
         } else {
