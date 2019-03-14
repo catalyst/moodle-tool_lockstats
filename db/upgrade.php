@@ -96,5 +96,17 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030700, 'tool', 'lockstats');
     }
 
+    if ($oldversion < 2019030702) {
+        $table = new xmldb_table('tool_lockstats_locks');
+        $field = new xmldb_field('latency', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'customdata');
+        $dbman->add_field($table, $field);
+
+        $table = new xmldb_table('tool_lockstats_history');
+        $field = new xmldb_field('latency', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'customdata');
+        $dbman->add_field($table, $field);
+
+        upgrade_plugin_savepoint(true, 2019030702, 'tool', 'pid');
+    }
+
     return true;
 }

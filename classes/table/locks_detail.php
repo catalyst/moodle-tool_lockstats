@@ -69,6 +69,7 @@ class locks_detail extends table_sql {
             'host'      => get_string('table_host', 'tool_lockstats'),
             'gained'    => get_string('table_gained', 'tool_lockstats'),
             'pid'       => get_string('table_pid', 'tool_lockstats'),
+            'latency'       => get_string('table_latency', 'tool_lockstats'),
         );
 
         $this->define_columns(array_keys($columns));
