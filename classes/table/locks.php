@@ -52,7 +52,7 @@ class locks extends html_table {
         $this->attributes['class'] = 'admintable generaltable';
 
         $headers = [get_string('table_lock_key', 'tool_lockstats'),
-            get_string('table_classname', 'tool_lockstats')];
+            get_string('name')];
         $rows = [];
 
         $records = $this->get_current_locks();
@@ -81,7 +81,9 @@ class locks extends html_table {
             if ($adhocid != null) {
                 $adhocrecord = $this->get_adhoc_record($adhocid);
                 $link = html_writer::link($url, $record->resourcekey);
-                $data = [$link, $adhocrecord->classname];
+                $name = ucwords(str_replace("_", " ", end(explode("\\", $adhocrecord->classname))));
+                $name = $name . "\n" . html_writer::tag('span', $adhocrecord->classname, ['class' => 'task-class']);
+                $data = [$link, $name];
             } else {
                 $link = html_writer::link($url, $record->resourcekey);
                 $data = [$link, null];

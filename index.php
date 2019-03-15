@@ -38,6 +38,7 @@ $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gaine
 $current = new tool_lockstats\table\locks();
 $history = new tool_lockstats\table\history(new moodle_url("/admin/tool/lockstats/index.php"));
 $tasks = new tool_lockstats\table\tasks();
+$adhoctasks = new tool_lockstats\table\adhoc_tasks();
 
 if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstats_history')) {
     $history->download();
@@ -59,6 +60,11 @@ $a = get_config('tool_lockstats', 'threshold');
 echo html_writer::tag('h1', get_string('h1_slowest', 'tool_lockstats', $a));
 $history->out(10, false);
 echo html_writer::empty_tag('br');
+
+// A list of ad hoc tasks aggregated by class.
+echo html_writer::tag('h1', get_string('h1_adhoctask', 'tool_lockstats'));
+echo html_writer::table($adhoctasks);
+
 
 // A list of tasks with history, the ability to select one and see its history filtered.
 echo html_writer::tag('h1', get_string('h1_nexttask', 'tool_lockstats'));

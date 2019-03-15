@@ -60,7 +60,7 @@ class history extends table_sql {
 
         $columns = array(
             'duration'  => get_string('table_duration', 'tool_lockstats'),
-            'classname'      => get_string('table_classname', 'tool_lockstats'),
+            'classname'      => get_string('name'),
         );
 
         $this->define_columns(array_keys($columns));
@@ -156,7 +156,10 @@ class history extends table_sql {
             'task' => $values->taskid,
             'tsort' => 'duration',
         ]);
-        $link = html_writer::link($url, $values->classname);
+
+        $link = ucwords(str_replace("_", " ", end(explode("\\", $values->classname))));
+        $link = html_writer::link($url, $link)
+            . "\n" . html_writer::tag('span', $values->classname, ['class' => 'task-class']);
 
         return $link;
     }
