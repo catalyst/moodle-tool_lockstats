@@ -199,15 +199,8 @@ class proxy_lock_factory implements lock_factory {
      * This is required, because we may be using persistent DB connections.
      */
     public function auto_release() {
-        // Called from the shutdown handler. Must release all open locks.
-        foreach ($this->openlocks as $id => $locks) {
-            foreach ($locks as $task => $unused) {
-                $lock = new lock($task, $this);
-
-                $this->log_unlock($task);
-
-                $lock->release();
-            }
+        if ($this->proxiedlockfactory->supports_auto_release()) {
+            $this->proxiedlockfactory->auto_release();
         }
     }
 
