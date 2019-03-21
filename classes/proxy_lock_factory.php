@@ -29,11 +29,16 @@ namespace tool_lockstats;
 use core\lock\lock;
 use core\lock\lock_config;
 use core\lock\lock_factory;
+use core\task\manager;
 use stdClass;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
+
+define ('LOCKSTAT_UNKNOWN', 0);
+define ('LOCKSTAT_ADHOC', 1);
+define ('LOCKSTAT_SCHEDULED', 2);
 
 /**
  * Proxy lock factory.
@@ -283,12 +288,35 @@ class proxy_lock_factory implements lock_factory {
                 }
             }
 
+            $record->type = LOCKSTAT_UNKNOWN;
+            preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
+            if (count($adhoc) > 0) {
+                $record->type = LOCKSTAT_ADHOC;
+            } else {
+                if ($record->classname) {
+                    $scheduledtask = manager::scheduled_task_from_record($record);
+                    if ($scheduledtask) {
+                        $record->type = LOCKSTAT_SCHEDULED;
+                    }
+                }
+            }
+
             if ($delta > get_config('tool_lockstats', 'threshold')) {
                 // The record is duration is higher than the threshold. Create a new record.
                 $this->log_history($record);
             } else {
                 // Lets update the lock count instead.
                 $this->log_update_count($record);
+            }
+
+            if ($record->type == LOCKSTAT_ADHOC) {
+
+                $adhocid = explode('_', $resourcekey);
+                $faildelay = $DB->get_record('task_adhoc', array('id' => $adhocid[1]), 'faildelay');
+
+                if (!$faildelay) {
+                    $DB->delete_records('tool_lockstats_locks', array('resourcekey' => $record->resourcekey));
+                }
             }
 
         }
@@ -330,7 +358,7 @@ class proxy_lock_factory implements lock_factory {
 
             preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
             if (count($adhoc) > 0) {
-                $history->latency += $history->latency;
+                $history->latency += $record->latency;
             }
 
             $DB->update_record('tool_lockstats_history', $history);

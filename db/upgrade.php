@@ -108,5 +108,35 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030702, 'tool', 'pid');
     }
 
+    if ($oldversion < 2019030703) {
+        $table = new xmldb_table('tool_lockstats_history');
+        $field = new xmldb_field('latency');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        // Update latency column to use INT instead of CHAR.
+        $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+
+        upgrade_plugin_savepoint(true, 2019030703, 'tool', 'pid');
+    }
+
+    if ($oldversion < 2019030706) {
+
+        $table = new xmldb_table('tool_lockstats_history');
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $dbman->add_field($table, $field);
+
+        $sql = "DELETE FROM {tool_lockstats_locks}
+                      WHERE " . $DB->sql_like('resourcekey', ':resourcek');
+
+        $params = [
+            'resourcek' => 'adhoc_%'
+        ];
+
+        // Delete adhoc records from locks table. They should only exist in history once processed.
+        $DB->execute($sql, $params);
+
+        upgrade_plugin_savepoint(true, 2019030706, 'tool', 'pid');
+    }
+
     return true;
 }
