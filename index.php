@@ -46,6 +46,13 @@ if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstat
 
 echo $OUTPUT->header();
 
+$enabled = get_config('tool_lockstats', 'enable');
+if (!$enabled) {
+    echo $OUTPUT->notification(get_string('errornotenabled', 'tool_lockstats'), 'warning');
+}
+
+
+
 if ($CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
     echo $OUTPUT->notification(get_string('errornolockfactory', 'tool_lockstats'), 'error');
 }
