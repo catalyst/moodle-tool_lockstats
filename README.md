@@ -46,6 +46,9 @@ This is an example of using the Postgres lock factory, add this to your config.p
 
 ```php
 $CFG->lock_factory = "\\tool_lockstats\\proxy_lock_factory";
+$CFG->proxied_lock_factory = "auto";
+
+# If you want to be explicit you can do this:
 $CFG->proxied_lock_factory = "\\core\\lock\\postgres_lock_factory";
 
 // To allow unit tests to pass.
