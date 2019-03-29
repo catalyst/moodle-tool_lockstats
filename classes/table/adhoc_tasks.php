@@ -125,7 +125,8 @@ class adhoc_tasks extends html_table {
 
         foreach ($classes as $class) {
 
-            $link = ucwords(str_replace("_", " ", end(explode("\\", $class->classname))));
+            $classname = explode("\\", $class->classname);
+            $link = ucwords(str_replace("_", " ", end($classname)));
             $text = $link . "\n" . html_writer::tag('span', $class->classname, ['class' => 'task-class']);
 
             $namecell = new html_table_cell($text);

@@ -157,7 +157,8 @@ class history extends table_sql {
             'tsort' => 'duration',
         ]);
 
-        $link = ucwords(str_replace("_", " ", end(explode("\\", $values->classname))));
+        $classname = explode("\\", $values->classname);
+        $link = ucwords(str_replace("_", " ", end($classname)));
         $link = html_writer::link($url, $link)
             . "\n" . html_writer::tag('span', $values->classname, ['class' => 'task-class']);
 
