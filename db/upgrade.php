@@ -138,5 +138,16 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019030706, 'tool', 'pid');
     }
 
+    if ($oldversion < 2019032900) {
+        $table = new xmldb_table('tool_lockstats_locks');
+        $field = new xmldb_field('latency');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        // Update latency column to use INT instead of CHAR.
+        $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+
+        upgrade_plugin_savepoint(true, 2019032900, 'tool', 'pid');
+
+    }
+
     return true;
 }
