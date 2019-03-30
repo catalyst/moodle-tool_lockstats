@@ -237,8 +237,10 @@ class proxy_lock_factory implements lock_factory {
             $record->host = gethostname();
             $record->pid = posix_getpid();
             $record = $this->fill_more_for_tasks($record, $resourcekey);
-            if (isset($timequeued)) {
+            if (isset($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
+            } else {
+                $record->latency = 0;
             }
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
@@ -246,7 +248,7 @@ class proxy_lock_factory implements lock_factory {
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
-            if (isset($timequeued)) {
+            if (isset($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             }
             $DB->update_record('tool_lockstats_locks', $record);

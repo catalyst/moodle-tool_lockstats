@@ -60,18 +60,25 @@ class adhoc_tasks extends html_table {
 
         $this->head = [
             get_string('name'),
-            get_string('component', 'tool_task'),
-            get_string('table_queuedup', 'tool_lockstats'),
-            get_string('table_processed', 'tool_lockstats'),
-            get_string('table_failed', 'tool_lockstats'),
-            get_string('table_latency', 'tool_lockstats')
+            get_string('component',         'tool_task'),
+            get_string('table_queuedup',    'tool_lockstats'),
+            get_string('table_running',     'tool_lockstats'),
+            get_string('table_processed',   'tool_lockstats'),
+            get_string('table_failed',      'tool_lockstats'),
+            get_string('table_latencyavg',  'tool_lockstats'),
+            get_string('table_latencymax',  'tool_lockstats'),
         ];
 
         $this->attributes['class'] = 'admintable generaltable';
 
         $data = [];
 
-        $latencysubquery = "
+        $latencyavgsubquery = "
+           SELECT avg(latency/lockcount)
+             FROM {tool_lockstats_history}
+            WHERE classname = classes.classname";
+
+        $latencymaxsubquery = "
            SELECT max(latency/lockcount)
              FROM {tool_lockstats_history}
             WHERE classname = classes.classname";
@@ -88,6 +95,13 @@ class adhoc_tasks extends html_table {
              JOIN {tool_lockstats_locks} tll ON tll.resourcekey = $concat
             WHERE ta.classname = classes.classname
                   AND ta.faildelay > 0";
+
+        $runningsubquery = "
+           SELECT COUNT(ta.*)
+             FROM {task_adhoc} ta
+             JOIN {tool_lockstats_locks} tll ON tll.resourcekey = $concat
+            WHERE ta.classname = classes.classname
+              AND released IS NULL";
 
         $queuedupsubquery = "
            SELECT COUNT(*)
@@ -113,10 +127,12 @@ class adhoc_tasks extends html_table {
         $sql = "
            SELECT classes.classname,
                   classes.component,
-                  ($latencysubquery) latency,
-                  ($processedsubquery) processed,
-                  ($faildelaysubquery) failed,
-                  ($queuedupsubquery) AS queuedup
+                  ($queuedupsubquery  ) queuedup,
+                  ($runningsubquery   ) running,
+                  ($processedsubquery ) processed,
+                  ($faildelaysubquery ) failed,
+                  ($latencyavgsubquery) latencyavg,
+                  ($latencymaxsubquery) latencymax
              FROM ($classessubquery) classes
          GROUP BY classes.classname,
                   classes.component";
@@ -152,9 +168,12 @@ class adhoc_tasks extends html_table {
                 $namecell,
                 $componentcell,
                 new html_table_cell($class->queuedup),
+                new html_table_cell($class->running),
                 new html_table_cell($class->processed),
                 new html_table_cell($class->failed),
-                new html_table_cell($class->latency)));
+                new html_table_cell(format_time(floor($class->latencyavg))),
+                new html_table_cell(format_time(floor($class->latencymax))),
+            ));
 
             $data[] = $row;
         }

@@ -60,7 +60,7 @@ class history extends table_sql {
 
         $columns = array(
             'duration'  => get_string('table_duration', 'tool_lockstats'),
-            'classname'      => get_string('name'),
+            'classname' => get_string('name'),
         );
 
         $this->define_columns(array_keys($columns));
