@@ -48,6 +48,7 @@ $string['privacy:metadata'] = 'Cron Lock statistics plugin does not store any pe
 $string['release_lock'] = 'Release lock';
 $string['reset_header'] = 'Reset lock statistics history';
 $string['reset_text'] = 'Reset the lock stastics history.';
+$string['table_customdata'] = 'Custom data';
 $string['table_duration'] = 'Average Duration';
 $string['table_gained'] = 'Time gained';
 $string['table_host'] = 'Last Host';

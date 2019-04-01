@@ -72,6 +72,11 @@ class locks_detail extends table_sql {
             'latency'       => get_string('table_latency', 'tool_lockstats'),
         );
 
+        $adhocid = locks::get_adhoc_id_by_task($resourcekey);
+        if ($adhocid != null) {
+            $columns['customdata'] = get_string('table_customdata', 'tool_lockstats');
+        }
+
         $this->define_columns(array_keys($columns));
         $this->define_headers(array_values($columns));
         $this->define_baseurl($baseurl);
