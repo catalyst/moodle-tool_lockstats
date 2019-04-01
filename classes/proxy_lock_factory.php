@@ -146,20 +146,25 @@ class proxy_lock_factory implements lock_factory {
         $lock = $this->proxiedlockfactory->get_lock($resourcekey, $timeout, $maxlifetime);
 
         if ($lock) {
-            $proxylock = new lock($resourcekey, $this);
+            $enabled = get_config('tool_lockstats', 'enable');
+            if ($enabled) {
+                $proxylock = new lock($resourcekey, $this);
 
-            $this->openlocks[$proxylock->get_key()][] = $lock;
+                $this->openlocks[$proxylock->get_key()][] = $lock;
 
-            $this->log_lock($proxylock->get_key());
+                $this->log_lock($proxylock->get_key());
 
-            if ($this->debug) {
-                mtrace('tool_lockstats [lock obtained]: ' . $proxylock->get_key());
+                if ($this->debug) {
+                    mtrace('tool_lockstats [lock obtained]: ' . $proxylock->get_key());
+                }
+
+                return $proxylock;
+            } else {
+                return $lock;
             }
-
-            return $proxylock;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -177,14 +182,16 @@ class proxy_lock_factory implements lock_factory {
 
         $lock->release();
 
-        if ($this->debug) {
-            mtrace('tool_lockstats [lock released]: ' . $resourcekey);
+        $enabled = get_config('tool_lockstats', 'enable');
+        if ($enabled) {
+            if ($this->debug) {
+                mtrace('tool_lockstats [lock released]: ' . $resourcekey);
+            }
+
+            $this->log_unlock($resourcekey);
         }
 
-        $this->log_unlock($resourcekey);
-
         unset($lock);
-
         return true;
     }
 

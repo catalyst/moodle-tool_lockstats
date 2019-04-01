@@ -39,6 +39,11 @@ if ($hassiteconfig) {
 
     if (!during_initial_install()) {
 
+        $settings->add(new admin_setting_configcheckbox('tool_lockstats/enable',
+            new lang_string('enable',        'tool_lockstats'),
+            new lang_string('enabledesc',    'tool_lockstats'),
+            '1'));
+
         $settings->add(new admin_setting_configduration('tool_lockstats/cleanup',
             new lang_string('cleanup',     'tool_lockstats'),
             new lang_string('cleanupdesc', 'tool_lockstats'),
