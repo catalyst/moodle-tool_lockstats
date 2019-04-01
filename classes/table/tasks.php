@@ -75,6 +75,7 @@ class tasks extends html_table {
 
         $sql = "SELECT taskid, classname
                   FROM {tool_lockstats_history} his
+                  WHERE classname IS NOT NULL
                  GROUP BY taskid, classname";
         $historyall = $DB->get_records_sql_menu($sql);
 

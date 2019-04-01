@@ -125,7 +125,8 @@ class adhoc_tasks extends html_table {
                   component";
 
         $sql = "
-           SELECT classes.classname,
+           SELECT DISTINCT ON (classes.classname)
+                  classes.classname,
                   classes.component,
                   ($queuedupsubquery  ) queuedup,
                   ($runningsubquery   ) running,
