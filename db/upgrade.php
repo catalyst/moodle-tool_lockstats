@@ -34,15 +34,15 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         $lockstable = new xmldb_table('tool_lockstats_locks');
         $historytable = new xmldb_table('tool_lockstats_history');
 
-        $field = new xmldb_field('task');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, null, null, null);
-        // Update task column to use CHAR instead of TEXT.
-        $dbman->change_field_type($lockstable, $field, $continue = true, $feedback = true);
-        $dbman->change_field_type($historytable, $field, $continue = true, $feedback = true);
-
         $index = new xmldb_index('task', XMLDB_INDEX_NOTUNIQUE, array('task'));
         // Conditionally launch add index.
         if (!$dbman->index_exists($lockstable, $index)) {
+            $field = new xmldb_field('task');
+            $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, null, null, null);
+
+            // Update task column to use CHAR instead of TEXT.
+            $dbman->change_field_type($lockstable, $field, $continue = true, $feedback = true);
+            $dbman->change_field_type($historytable, $field, $continue = true, $feedback = true);
             $dbman->add_index($lockstable, $index);
         }
         upgrade_plugin_savepoint(true, 2019011600, 'tool', 'lockstats');
@@ -99,13 +99,17 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
     if ($oldversion < 2019030702) {
         $table = new xmldb_table('tool_lockstats_locks');
         $field = new xmldb_field('latency', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'customdata');
-        $dbman->add_field($table, $field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         $table = new xmldb_table('tool_lockstats_history');
         $field = new xmldb_field('latency', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'customdata');
-        $dbman->add_field($table, $field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2019030702, 'tool', 'lockstats');
 
-        upgrade_plugin_savepoint(true, 2019030702, 'tool', 'pid');
     }
 
     if ($oldversion < 2019030703) {
@@ -115,7 +119,7 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         // Update latency column to use INT instead of CHAR.
         $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
 
-        upgrade_plugin_savepoint(true, 2019030703, 'tool', 'pid');
+        upgrade_plugin_savepoint(true, 2019030703, 'tool', 'lockstats');
     }
 
     if ($oldversion < 2019030706) {
@@ -135,7 +139,7 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         // Delete adhoc records from locks table. They should only exist in history once processed.
         $DB->execute($sql, $params);
 
-        upgrade_plugin_savepoint(true, 2019030706, 'tool', 'pid');
+        upgrade_plugin_savepoint(true, 2019030706, 'tool', 'lockstats');
     }
 
     if ($oldversion < 2019032900) {
@@ -145,7 +149,7 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         // Update latency column to use INT instead of CHAR.
         $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
 
-        upgrade_plugin_savepoint(true, 2019032900, 'tool', 'pid');
+        upgrade_plugin_savepoint(true, 2019032900, 'tool', 'lockstats');
 
     }
 
