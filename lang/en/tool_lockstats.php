@@ -68,6 +68,6 @@ $string['table_queuedup'] = 'Queued';
 $string['table_running'] = 'Running';
 $string['table_failed'] = 'Failed';
 $string['task_cleanup'] = 'Cleanup lockstats history';
-$stinrg['table_latency'] = 'Latency';
+$string['table_latency'] = 'Latency';
 $string['threshold'] = 'History threshold';
 $string['thresholddesc'] = 'Only log new history entries when the cron task time exceeds this value.';
