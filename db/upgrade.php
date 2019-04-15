@@ -179,5 +179,16 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019041100, 'tool', 'lockstats');
     }
 
+    if ($oldversion < 2019041502) {
+        $table = new xmldb_table('tool_lockstats_locks');
+
+        $field = new xmldb_field('customdata');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'big');
+
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_plugin_savepoint(true, 2019041502, 'tool', 'lockstats');
+    }
+
     return true;
 }
