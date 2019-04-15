@@ -179,5 +179,36 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019041100, 'tool', 'lockstats');
     }
 
+    if ($oldversion < 2019041501) {
+        $tables = ['tool_lockstats_locks', 'tool_lockstats_history'];
+        $fields = ['resourcekey', 'component', 'classname', 'customdata'];
+
+        foreach ($tables as $tablename) {
+            foreach ($fields as $fieldname) {
+                $table = new xmldb_table($tablename);
+                $field = new xmldb_field($fieldname);
+                if ($dbman->field_exists($table, $field)) {
+
+                    if ($fieldname == 'resourcekey') {
+                        $index = new xmldb_index('toollocklock_res_ix', null, array('resourcekey'));
+                        if ($dbman->index_exists($table, $index)) {
+                            $dbman->drop_index($table, $index);
+                        }
+                    }
+
+                    $field->set_attributes(XMLDB_TYPE_CHAR, '1024');
+                    $dbman->change_field_precision($table, $field);
+                }
+
+            }
+        }
+
+        $table = new xmldb_table('tool_lockstats_locks');
+        $index = new xmldb_index('toollocklock_res_ix', XMLDB_INDEX_NOTUNIQUE, array('resourcekey'));
+        $dbman->add_index($table, $index);
+
+        upgrade_plugin_savepoint(true, 2019041501, 'tool', 'lockstats');
+    }
+
     return true;
 }
