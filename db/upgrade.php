@@ -190,5 +190,21 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019041502, 'tool', 'lockstats');
     }
 
+    if ($oldversion < 2019042303) {
+        $table = new xmldb_table('tool_lockstats_locks');
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $sql = "DELETE FROM {tool_lockstats_locks}
+                      WHERE component IS NULL";
+
+        $DB->execute($sql);
+
+        upgrade_plugin_savepoint(true, 2019042303, 'tool', 'lockstats');
+    }
+
     return true;
 }
