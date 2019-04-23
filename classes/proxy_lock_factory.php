@@ -258,7 +258,17 @@ class proxy_lock_factory implements lock_factory {
             if (isset($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             }
-            $DB->update_record('tool_lockstats_locks', $record);
+
+            $resourcekeyprepared = addslashes($resourcekey);
+            $sql = "UPDATE {tool_lockstats_locks}
+                       SET gained = ?,
+                           released = ?,
+                           host = ?,
+                           pid = ?,
+                           latency = ?
+                     WHERE resourcekey = '$resourcekeyprepared'";
+            $DB->execute($sql, array($record->gained, $record->released,
+                $record->host, $record->pid, $record->latency));
         }
 
         return $record;
@@ -285,7 +295,11 @@ class proxy_lock_factory implements lock_factory {
             $record->released = time();
             $record->duration = $delta;
 
-            $DB->update_record('tool_lockstats_locks', $record);
+            $resourcekeyprepared = addslashes($resourcekey);
+            $sql = "UPDATE {tool_lockstats_locks}
+                       SET released = ?
+                     WHERE resourcekey = '$resourcekeyprepared'";
+            $DB->execute($sql, array($record->released));
 
             // Prevent logging tasks that exist in the blacklist.
             $blacklist = get_config('tool_lockstats', 'blacklist');
