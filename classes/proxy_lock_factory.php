@@ -249,6 +249,7 @@ class proxy_lock_factory implements lock_factory {
             } else {
                 $record->latency = 0;
             }
+            $this->update_lock_type($record);
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
             $record->gained = time();
@@ -259,6 +260,7 @@ class proxy_lock_factory implements lock_factory {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             }
 
+            $this->update_lock_type($record);
             $resourcekeyprepared = addslashes($resourcekey);
             $sql = "UPDATE {tool_lockstats_locks}
                        SET gained = ?,
@@ -312,18 +314,7 @@ class proxy_lock_factory implements lock_factory {
                 }
             }
 
-            $record->type = LOCKSTAT_UNKNOWN;
-            preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
-            if (count($adhoc) > 0) {
-                $record->type = LOCKSTAT_ADHOC;
-            } else {
-                if ($record->classname) {
-                    $scheduledtask = manager::scheduled_task_from_record($record);
-                    if ($scheduledtask) {
-                        $record->type = LOCKSTAT_SCHEDULED;
-                    }
-                }
-            }
+            $this->update_lock_type($record);
 
             if ($delta > get_config('tool_lockstats', 'threshold')) {
                 // The record is duration is higher than the threshold. Create a new record.
@@ -333,12 +324,15 @@ class proxy_lock_factory implements lock_factory {
                 $this->log_update_count($record);
             }
 
-            if ($record->type == LOCKSTAT_ADHOC) {
+            if ($record->type !== LOCKSTAT_SCHEDULED) {
+                if ($record->type == LOCKSTAT_ADHOC) {
+                    $adhocid = explode('_', $resourcekey);
+                    $faildelay = $DB->get_record('task_adhoc', array('id' => $adhocid[1]), 'faildelay');
 
-                $adhocid = explode('_', $resourcekey);
-                $faildelay = $DB->get_record('task_adhoc', array('id' => $adhocid[1]), 'faildelay');
-
-                if (!$faildelay) {
+                    if (!$faildelay) {
+                        $DB->delete_records('tool_lockstats_locks', array('resourcekey' => $record->resourcekey));
+                    }
+                } else {
                     $DB->delete_records('tool_lockstats_locks', array('resourcekey' => $record->resourcekey));
                 }
             }
@@ -464,4 +458,22 @@ class proxy_lock_factory implements lock_factory {
         return $record;
     }
 
+    /**
+     * Update lock type.
+     * @param stdClass $record
+     */
+    private function update_lock_type($record) {
+        $record->type = LOCKSTAT_UNKNOWN;
+        preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
+        if (count($adhoc) > 0) {
+            $record->type = LOCKSTAT_ADHOC;
+        } else {
+            if (isset($record->classname)) {
+                $scheduledtask = manager::scheduled_task_from_record($record);
+                if ($scheduledtask) {
+                    $record->type = LOCKSTAT_SCHEDULED;
+                }
+            }
+        }
+    }
 }
