@@ -27,8 +27,11 @@
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+require_login(null, false);
 require_capability('moodle/site:config', context_system::instance());
 admin_externalpage_setup('tool_lockstats');
+
+\core\session\manager::write_close();
 
 $download = optional_param('download', '', PARAM_ALPHA);
 
