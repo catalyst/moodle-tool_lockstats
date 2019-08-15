@@ -84,13 +84,31 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         if (!$dbman->field_exists($historytable, $historycomponentfield)) {
             $dbman->add_field($historytable, $historycomponentfield);
         }
+        // Conditionally launch add field customdata.
+        if (!$dbman->field_exists($historytable, $customdatafield)) {
+            $dbman->add_field($historytable, $customdatafield);
+        }
 
         // Keep other task names but not adhoc tasks since old data in the field is not adhoc task name.
         $DB->execute('UPDATE {tool_lockstats_locks} SET classname = resourcekey WHERE ' . $DB->sql_like('resourcekey', ':resourcek'), array('resourcek' => 'adhoc_%') );
         // Fill in components for scheduled tasks.
-        $updatelockssql = 'UPDATE {tool_lockstats_locks} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_locks}.resourcekey';
+        if ($DB->get_dbfamily() === 'mysql') {
+            $updatelockssql = 'UPDATE {tool_lockstats_locks} tlh
+                                INNER JOIN {task_scheduled} ts
+                                SET tlh.component = ts.component
+                                WHERE ts.classname = tlh.resourcekey';
+        } else {
+            $updatelockssql = 'UPDATE {tool_lockstats_locks} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_locks}.resourcekey';
+        }
         $DB->execute($updatelockssql);
-        $updatehistorysql = 'UPDATE {tool_lockstats_history} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_history}.classname';
+        if ($DB->get_dbfamily() === 'mysql') {
+            $updatehistorysql = 'UPDATE {tool_lockstats_history} tlh
+                                    INNER JOIN {task_scheduled} ts
+                                    SET tlh.component = ts.component
+                                    WHERE ts.classname = tlh.classname';
+        } else {
+            $updatehistorysql = 'UPDATE {tool_lockstats_history} SET component = ts.component FROM  {task_scheduled} ts WHERE ts.classname = {tool_lockstats_history}.classname';
+        }
         $DB->execute($updatehistorysql);
 
         upgrade_plugin_savepoint(true, 2019030700, 'tool', 'lockstats');
