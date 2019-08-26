@@ -64,25 +64,32 @@ class proxy_lock_testcase extends advanced_testcase {
 
         if ($lockfactory->is_available()) {
             // This should work.
-            $lock1 = $lockfactory->get_lock('abc', 2);
+            $lock1 = $lockfactory->get_lock('\abc', 2);
             $this->assertNotEmpty($lock1, 'Get a lock');
+            $current = new tool_lockstats\table\locks();
 
             if ($lockfactory->supports_timeout()) {
                 if ($lockfactory->supports_recursion()) {
-                    $lock2 = $lockfactory->get_lock('abc', 2);
+                    $lock2 = $lockfactory->get_lock('\abc', 2);
                     $this->assertNotEmpty($lock2, 'Get a stacked lock');
                     $this->assertTrue($lock2->release(), 'Release a stacked lock');
                 } else {
                     // This should timeout.
-                    $lock2 = $lockfactory->get_lock('abc', 2);
+                    $lock2 = $lockfactory->get_lock('\abc', 2);
                     $this->assertFalse($lock2, 'Cannot get a stacked lock');
                 }
             }
-
+            // Current locks table should have the lock.
+            $this->assertContains('\abc', $current->data[0]->cells[0]->text);
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');
+
+            // Lock released, current locks table should be empty.
+            $current = new tool_lockstats\table\locks();
+            $this->assertEmpty($current->data);
+
             // Get it again.
-            $lock3 = $lockfactory->get_lock('abc', 2);
+            $lock3 = $lockfactory->get_lock('\abc', 2);
 
             $this->assertNotEmpty($lock3, 'Get a lock again');
             // Release the lock again.
@@ -91,15 +98,47 @@ class proxy_lock_testcase extends advanced_testcase {
             $this->assertFalse($lock3->release(), 'Release a lock that is not held');
             if (!$lockfactory->supports_auto_release()) {
                 // Test that a lock can be claimed after the timeout period.
-                $lock4 = $lockfactory->get_lock('abc', 2, 2);
+                $lock4 = $lockfactory->get_lock('\abc', 2, 2);
                 $this->assertNotEmpty($lock4, 'Get a lock');
                 sleep(3);
 
-                $lock5 = $lockfactory->get_lock('abc', 2, 2);
+                $lock5 = $lockfactory->get_lock('\abc', 2, 2);
                 $this->assertNotEmpty($lock5, 'Get another lock after a timeout');
                 $this->assertTrue($lock5->release(), 'Release the lock');
                 $this->assertTrue($lock4->release(), 'Release the lock');
             }
+        }
+    }
+
+    /**
+     * Run a suite of tests on a lock factory.
+     * @param \core\lock\lock_factory $lockfactory - A lock factory to test
+     */
+    protected function run_on_lock_factory_sql_injection_attack(\core\lock\lock_factory $lockfactory) {
+        if ($lockfactory->is_available()) {
+            $lock1 = $lockfactory->get_lock("'foo'||'bar'", 2);
+            $this->assertNotEmpty($lock1, 'Get a lock');
+            $this->assertTrue($lock1->release(), 'Release a lock');
+
+            $lock2 = $lockfactory->get_lock('foo " bar', 2);
+            $this->assertNotEmpty($lock2, 'Get a lock');
+            $this->assertTrue($lock2->release(), 'Release a lock');
+
+            $lock3 = $lockfactory->get_lock("foo ' bar", 2);
+            $this->assertNotEmpty($lock3, 'Get a lock');
+            $this->assertTrue($lock3->release(), 'Release a lock');
+
+            // $lock4 = $lockfactory->get_lock("\xbf\x27 OR 1=1", 2);
+            // $this->assertNotEmpty($lock4, 'Get a lock');
+            // $this->assertTrue($lock4->release(), 'Release a lock');
+
+            $lock5 = $lockfactory->get_lock("' OR 1=1 /*", 2);
+            $this->assertNotEmpty($lock5, 'Get a lock');
+            $this->assertTrue($lock5->release(), 'Release a lock');
+
+            $lock6 = $lockfactory->get_lock('%_abc_%', 2);
+            $this->assertNotEmpty($lock6, 'Get a lock');
+            $this->assertTrue($lock6->release(), 'Release a lock');
         }
     }
 
@@ -110,5 +149,6 @@ class proxy_lock_testcase extends advanced_testcase {
     public function test_proxy_lock() {
         $lockfactory = \core\lock\lock_config::get_lock_factory('test');
         $this->run_on_lock_factory($lockfactory);
+        $this->run_on_lock_factory_sql_injection_attack($lockfactory);
     }
 }
