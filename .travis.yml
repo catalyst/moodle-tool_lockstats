@@ -12,6 +12,8 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+dist: trusty
+
 php:
   - 5.5
   - 7.0
