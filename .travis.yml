@@ -12,6 +12,8 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+dist: trusty
+
 php:
   - 5.5
   - 7.0
@@ -19,6 +21,9 @@ php:
 
 addons:
   postgresql: "9.4"
+
+services:
+  - mysql
 
 env:
   - DB=pgsql MOODLE_BRANCH=MOODLE_29_STABLE

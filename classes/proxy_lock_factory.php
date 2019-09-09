@@ -261,7 +261,7 @@ class proxy_lock_factory implements lock_factory {
             }
 
             $this->update_lock_type($record);
-            $resourcekeyprepared = addslashes($resourcekey);
+            $resourcekeyprepared = $DB->get_manager()->generator->addslashes($resourcekey);
             $sql = "UPDATE {tool_lockstats_locks}
                        SET gained = ?,
                            released = ?,
@@ -297,7 +297,7 @@ class proxy_lock_factory implements lock_factory {
             $record->released = time();
             $record->duration = $delta;
 
-            $resourcekeyprepared = addslashes($resourcekey);
+            $resourcekeyprepared = $DB->get_manager()->generator->addslashes($resourcekey);
             $sql = "UPDATE {tool_lockstats_locks}
                        SET released = ?
                      WHERE resourcekey = '$resourcekeyprepared'";
