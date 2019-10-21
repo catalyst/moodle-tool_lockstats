@@ -51,7 +51,8 @@ echo $OUTPUT->header();
 
 $enabled = get_config('tool_lockstats', 'enable');
 if (!$enabled) {
-    echo $OUTPUT->notification(get_string('errornotenabled', 'tool_lockstats'), 'warning');
+    echo $OUTPUT->notification(get_string('errornotenabled', 'tool_lockstats',
+        $CFG->wwwroot.'/admin/settings.php?section=tool_lockstats_settings'), 'warning');
 }
 
 
