@@ -36,7 +36,7 @@ $string['debug'] = 'Debug';
 $string['debugdesc'] = 'Print additional helpful debug output in the cron.log';
 $string['enable'] = 'Enable';
 $string['enabledesc'] = 'Enable lock statistics';
-$string['errornolockfactory'] = 'Error: The lock_factory is not configured properly in config.php:<br>$CFG->lock_factory = \'\\tool_lockstats\\proxy_lock_factor\';';
+$string['errornolockfactory'] = 'Error: The lock_factory is not configured properly in config.php:<br>$CFG->lock_factory = \'\\tool_lockstats\\proxy_lock_factory\';';
 $string['errornotenabled'] = 'Warning: lockstats plugin is not enabled. Please enable it on <a href="{$a}">plugin settings page</a>';
 $string['form_reset_button'] = 'Reset lock history';
 $string['form_reset_warning'] = 'Warning. You are about to reset the lock statistics history. Are you sure you want to do this?';
