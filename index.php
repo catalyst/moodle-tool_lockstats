@@ -57,7 +57,7 @@ if (!$enabled) {
 
 
 
-if ($CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
+if (!array_key_exists('lock_factory', $CFG) || $CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
     echo $OUTPUT->notification(get_string('errornolockfactory', 'tool_lockstats'), 'error');
 }
 
