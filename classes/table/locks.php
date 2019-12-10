@@ -81,7 +81,9 @@ class locks extends html_table {
             if ($adhocid != null) {
                 $adhocrecord = $this->get_adhoc_record($adhocid);
                 $link = html_writer::link($url, $record->resourcekey);
-                $name = ucwords(str_replace("_", " ", end(explode("\\", $adhocrecord->classname))));
+                $name = explode("\\", $adhocrecord->classname);
+                $name = end($name);
+                $name = ucwords(str_replace("_", " ", $name));
                 $name = $name . "\n" . html_writer::tag('span', $adhocrecord->classname, ['class' => 'task-class']);
                 $data = [$link, $name];
             } else {
@@ -113,7 +115,7 @@ class locks extends html_table {
      *
      * @return array
      */
-    private function get_current_locks() {
+    public function get_current_locks() {
         global $DB;
 
         // Return the longest running locks in a descending order.
@@ -127,7 +129,7 @@ class locks extends html_table {
      *
      * @return object
      */
-    private function get_adhoc_record($adhocid) {
+    public function get_adhoc_record($adhocid) {
         global $DB;
         return $DB->get_record('task_adhoc', array('id' => $adhocid));
     }

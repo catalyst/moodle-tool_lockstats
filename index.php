@@ -62,7 +62,7 @@ if (!array_key_exists('lock_factory', $CFG) || $CFG->lock_factory != "\\tool_loc
 }
 
 // Current locks.
-echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats'));
+echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats') . ' (' . count($records) . ')');
 echo html_writer::table($current);
 echo html_writer::empty_tag('br');
 
