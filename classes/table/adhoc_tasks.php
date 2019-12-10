@@ -70,6 +70,16 @@ class adhoc_tasks extends html_table {
         ];
 
         $this->attributes['class'] = 'admintable generaltable';
+        $this->colclasses = array(
+            'leftalign',
+            'leftalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+        );
 
         $data = [];
 
