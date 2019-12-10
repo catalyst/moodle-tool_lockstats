@@ -83,3 +83,21 @@ Provides additional debugging messages in the cron.log for when the locks are ob
 You can view the current locked tasks, lock history and details via the UI at,
 
 `Site administration > Server > Lock statistics`
+
+The list of current locks is also exposed via a cli script:
+
+```sh
+$ php admin/tool/lockstats/cli/list_locks.php 
+    PID HOST       TYPE    TIME     KEY                  NAME                                    
+  10806 zebrafish  adhoc   00:00:06 adhoc_65943          \tool_testtasks\task\timed_adhoc_task   
+  10810 zebrafish  adhoc   00:00:05 adhoc_65945          \tool_testtasks\task\timed_adhoc_task   
+  10808 zebrafish  adhoc   00:00:05 adhoc_65944          \tool_testtasks\task\timed_adhoc_task   
+
+Found 3 lock(s)
+```
+
+And you can watch this for a dynamic list of processes:
+
+```sh
+watch -n 1 php admin/tool/lockstats/cli/list_locks.php
+```
