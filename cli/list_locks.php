@@ -94,7 +94,7 @@ foreach ($records as $record) {
 
     printf ($format,
         $record->pid,
-        substr($record->host,0,10),
+        substr($record->host, 0, 10),
         $type,
         gmdate("H:i:s", (time() - $record->gained)),
         substr($record->resourcekey, 0, 20),

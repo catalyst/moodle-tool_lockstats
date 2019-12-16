@@ -90,7 +90,8 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         }
 
         // Keep other task names but not adhoc tasks since old data in the field is not adhoc task name.
-        $DB->execute('UPDATE {tool_lockstats_locks} SET classname = resourcekey WHERE ' . $DB->sql_like('resourcekey', ':resourcek'), array('resourcek' => 'adhoc_%') );
+        $DB->execute('UPDATE {tool_lockstats_locks} SET classname = resourcekey WHERE '
+                . $DB->sql_like('resourcekey', ':resourcek'), array('resourcek' => 'adhoc_%') );
         // Fill in components for scheduled tasks.
         if ($DB->get_dbfamily() === 'mysql') {
             $updatelockssql = 'UPDATE {tool_lockstats_locks} tlh
