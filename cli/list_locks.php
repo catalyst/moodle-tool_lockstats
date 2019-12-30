@@ -60,7 +60,7 @@ EOF;
 $current = new tool_lockstats\table\locks();
 $records = $current->get_current_locks();
 
-$format = "%7s %-10s %-7s %-8s %-20s %-40s\n";
+$format = "%7s %-12s %-8s %-8s %-20s %-40s\n";
 printf ($format,
     'PID',
     'HOST',
@@ -80,12 +80,23 @@ foreach ($records as $record) {
         $name = '';
     }
 
+    $maxadhoclimit = get_config('core', 'task_adhoc_concurrency_limit');
+    $maxcronlimit = get_config('core', 'task_scheduled_concurrency_limit');
+
     switch ($record->type) {
         case LOCKSTAT_ADHOC:
             $type = 'adhoc';
             break;
+        case LOCKSTAT_MAXADHOC:
+            $type = 'maxadhoc';
+            $name = 'One of ' . $maxadhoclimit .  ' $CFG->task_adhoc_concurrency_limit';
+            break;
         case LOCKSTAT_SCHEDULED:
             $type = 'cron';
+            break;
+        case LOCKSTAT_MAXSCHEDULED:
+            $type = 'maxcron';
+            $name = 'One of ' . $maxcronlimit . ' $CFG->task_scheduled_concurrency_limit';
             break;
         default:
             $type = 'unknown';
@@ -94,7 +105,7 @@ foreach ($records as $record) {
 
     printf ($format,
         $record->pid,
-        substr($record->host, 0, 10),
+        substr($record->host, 0, 12),
         $type,
         gmdate("H:i:s", (time() - $record->gained)),
         substr($record->resourcekey, 0, 20),

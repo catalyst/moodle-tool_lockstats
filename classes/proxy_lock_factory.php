@@ -39,6 +39,8 @@ if (!defined('MOODLE_INTERNAL')) {
 define ('LOCKSTAT_UNKNOWN', 0);
 define ('LOCKSTAT_ADHOC', 1);
 define ('LOCKSTAT_SCHEDULED', 2);
+define ('LOCKSTAT_MAXSCHEDULED', 3);
+define ('LOCKSTAT_MAXADHOC', 4);
 
 /**
  * Proxy lock factory.
@@ -464,16 +466,31 @@ class proxy_lock_factory implements lock_factory {
      */
     private function update_lock_type($record) {
         $record->type = LOCKSTAT_UNKNOWN;
+
+        preg_match(" /^scheduled_task_runner_(\d+)$/", $record->resourcekey, $adhoc);
+        if (count($adhoc) > 0) {
+            $record->type = LOCKSTAT_MAXSCHEDULED;
+            return;
+        }
+
+        preg_match(" /^adhoc_task_runner_(\d+)$/", $record->resourcekey, $adhoc);
+        if (count($adhoc) > 0) {
+            $record->type = LOCKSTAT_MAXADHOC;
+            return;
+        }
+
         preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
         if (count($adhoc) > 0) {
             $record->type = LOCKSTAT_ADHOC;
-        } else {
-            if (isset($record->classname)) {
-                $scheduledtask = manager::scheduled_task_from_record($record);
-                if ($scheduledtask) {
-                    $record->type = LOCKSTAT_SCHEDULED;
-                }
+            return;
+        }
+
+        if (isset($record->classname)) {
+            $scheduledtask = manager::scheduled_task_from_record($record);
+            if ($scheduledtask) {
+                $record->type = LOCKSTAT_SCHEDULED;
             }
         }
+
     }
 }
