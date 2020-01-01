@@ -75,7 +75,9 @@ foreach ($records as $record) {
     $adhocid = $current::get_adhoc_id_by_task($record->resourcekey);
     if ($adhocid != null) {
         $adhocrecord = $current->get_adhoc_record($adhocid);
-        $name = $adhocrecord->classname;
+        if (!empty($adhocrecord)) {
+            $name = $adhocrecord->classname;
+        }
     } else {
         $name = '';
     }
