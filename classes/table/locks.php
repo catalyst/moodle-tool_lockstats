@@ -81,10 +81,13 @@ class locks extends html_table {
             if ($adhocid != null) {
                 $adhocrecord = $this->get_adhoc_record($adhocid);
                 $link = html_writer::link($url, $record->resourcekey);
-                $name = explode("\\", $adhocrecord->classname);
-                $name = end($name);
-                $name = ucwords(str_replace("_", " ", $name));
-                $name = $name . "\n" . html_writer::tag('span', $adhocrecord->classname, ['class' => 'task-class']);
+                $name = '';
+                if (!empty($adhocrecord)) {
+                    $name = explode("\\", $adhocrecord->classname);
+                    $name = end($name);
+                    $name = ucwords(str_replace("_", " ", $name));
+                    $name = $name . "\n" . html_writer::tag('span', $adhocrecord->classname, ['class' => 'task-class']);
+                }
                 $data = [$link, $name];
             } else {
                 $link = html_writer::link($url, $record->resourcekey);
