@@ -34,6 +34,7 @@ admin_externalpage_setup('tool_lockstats');
 \core\session\manager::write_close();
 
 $download = optional_param('download', '', PARAM_ALPHA);
+$action = optional_param('action', '', PARAM_TEXT);
 
 // Return the longest running locks in a descending order.
 $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained DESC');
@@ -45,6 +46,13 @@ $adhoctasks = new tool_lockstats\table\adhoc_tasks();
 
 if ($history->is_downloading($download, 'tool_lockstats_history', 'tool_lockstats_history')) {
     $history->download();
+}
+
+$currentlocks = $current->get_current_locks();
+if ($action === 'releaseall') {
+    require_sesskey();
+    releasealllocks($currentlocks);
+    redirect(new moodle_url('/admin/tool/lockstats/'));
 }
 
 echo $OUTPUT->header();
@@ -63,6 +71,11 @@ if (!array_key_exists('lock_factory', $CFG) || $CFG->lock_factory != "\\tool_loc
 
 // Current locks.
 echo html_writer::tag('h1', get_string('h1_current', 'tool_lockstats') . ' (' . count($records) . ')');
+if ($currentlocks) {
+    // Only display the button if there are locks to be released.
+    $url = new moodle_url("/admin/tool/lockstats/index.php", array('action' => 'releaseall'));
+    echo $OUTPUT->single_button($url, get_string('release_all_locks', 'tool_lockstats'));
+}
 echo html_writer::table($current);
 echo html_writer::empty_tag('br');
 
@@ -88,3 +101,15 @@ echo html_writer::empty_tag('br');
 echo html_writer::link($reseturl, $resettext);
 
 echo $OUTPUT->footer();
+
+function releasealllocks($locks) {
+    if (isset($locks)) {
+        $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');
+        foreach ($locks as $lock) {
+            $lock = $cronlockfactory->get_lock($lock->resourcekey, 0);
+            if ($lock) {
+                $cronlockfactory->release_lock($lock);
+            }
+        }
+    }
+}
