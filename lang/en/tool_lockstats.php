@@ -48,6 +48,7 @@ $string['h1_nexttask'] = 'Next running tasks';
 $string['lock_in_use'] = 'Lock still in use by another process';
 $string['pluginname'] = 'Cron Lock statistics';
 $string['privacy:metadata'] = 'Cron Lock statistics plugin does not store any personal data.';
+$string['release_all_locks'] = 'Release all stale locks';
 $string['release_lock'] = 'Release lock';
 $string['reset_header'] = 'Reset lock statistics history';
 $string['reset_text'] = 'Reset the lock stastics history.';
