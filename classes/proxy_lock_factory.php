@@ -246,7 +246,7 @@ class proxy_lock_factory implements lock_factory {
             $record->host = gethostname();
             $record->pid = posix_getpid();
             $record = $this->fill_more_for_tasks($record, $resourcekey);
-            if (isset($timequeued) && $timequeued->nextruntime > 0) {
+            if (!empty($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             } else {
                 $record->latency = 0;
@@ -258,7 +258,7 @@ class proxy_lock_factory implements lock_factory {
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
-            if (isset($timequeued) && $timequeued->nextruntime > 0) {
+            if (!empty($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             }
 
@@ -442,11 +442,11 @@ class proxy_lock_factory implements lock_factory {
 
         $adhocid = \tool_lockstats\table\locks::get_adhoc_id_by_task($resourcekey);
         if ($adhocid != null) {
-            $adhocparams = ['id' => $adhocid];
-            $adhocselect = $DB->sql_compare_text('id') . ' = ' . $DB->sql_compare_text(':id');
-            $adhocrecord = $DB->get_record_select('task_adhoc', $adhocselect, $adhocparams);
-            $record->classname = $adhocrecord->classname;
-            $record->customdata = $adhocrecord->customdata;
+            if ($adhocrecord = $DB->get_record('task_adhoc', ['id' => $adhocid])) {
+                // The task could have been picked up already.
+                $record->classname = $adhocrecord->classname;
+                $record->customdata = $adhocrecord->customdata;
+            }
         } else {
             $scheduledparams = ['classname' => $resourcekey];
             $scheduledselect = $DB->sql_compare_text('classname') . ' = ' . $DB->sql_compare_text(':classname');
