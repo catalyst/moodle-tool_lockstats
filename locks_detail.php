@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Proxy lock factory, locaks detail page.
+ * Proxy lock factory, locks detail page.
  *
  * @package    tool_lockstats
  * @author     John Yao <johnyao@catalyst-au.net>

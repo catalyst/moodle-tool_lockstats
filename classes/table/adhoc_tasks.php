@@ -37,9 +37,7 @@ use html_writer;
 use moodle_url;
 use stdClass;
 
-define ('LOCKSTAT_UNKNOWN', 0);
-define ('LOCKSTAT_ADHOC', 1);
-define ('LOCKSTAT_SCHEDULED', 2);
+require_once($CFG->dirroot . '/admin/tool/lockstats/classes/proxy_lock_factory.php');
 
 /**
  * Proxy lock factory, adhoc task summary table.
