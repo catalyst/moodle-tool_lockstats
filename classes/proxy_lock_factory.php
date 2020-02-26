@@ -41,7 +41,7 @@ define ('LOCKSTAT_ADHOC', 1);
 define ('LOCKSTAT_SCHEDULED', 2);
 define ('LOCKSTAT_MAXSCHEDULED', 3);
 define ('LOCKSTAT_MAXADHOC', 4);
-
+define ('LOCKSTAT_CORE_CRON', 5);
 /**
  * Proxy lock factory.
  *
@@ -470,6 +470,11 @@ class proxy_lock_factory implements lock_factory {
      */
     private function update_lock_type($record) {
         $record->type = LOCKSTAT_UNKNOWN;
+
+        if ($record->resourcekey == 'core_cron') {
+            $record->type = LOCKSTAT_CORE_CRON;
+            return;
+        }
 
         preg_match(" /^scheduled_task_runner_(\d+)$/", $record->resourcekey, $adhoc);
         if (count($adhoc) > 0) {
