@@ -100,6 +100,10 @@ foreach ($records as $record) {
             $type = 'maxcron';
             $name = 'One of ' . $maxcronlimit . ' $CFG->task_scheduled_concurrency_limit';
             break;
+        case LOCKSTAT_CORE_CRON:
+            $type = 'core';
+            $name = 'Global queue lock';
+            break;
         default:
             $type = 'unknown';
             break;
