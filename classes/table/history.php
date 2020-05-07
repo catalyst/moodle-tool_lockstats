@@ -147,22 +147,35 @@ class history extends table_sql {
      * @return string
      */
     public function col_classname($values) {
-
+        global $DB;
         if ($this->is_downloading()) {
             return $values->taskid;
         }
 
-        $url = new moodle_url("/admin/tool/lockstats/detail.php", [
-            'task' => $values->taskid,
-            'tsort' => 'duration',
-        ]);
+        // Classname can occasionally be empty from adhoc tasks.
+        if (empty($values->classname)) {
+            // If there is no class information, use a normalised resource key for the lock.
+            $resourcekey = $DB->get_field('tool_lockstats_locks', 'resourcekey', ['id' => $values->taskid]);
+            if ($resourcekey !== false && !empty($resourcekey)) {
+                return $resourcekey;
+            } else {
+                // If the lock record is missing, display a message.
+                return get_string('table_missinglock', 'tool_lockstats');
+            }
+        } else {
+            $url = new moodle_url("/admin/tool/lockstats/detail.php", [
+                'task' => $values->taskid,
+                'tsort' => 'duration',
+            ]);
 
-        $classname = explode("\\", $values->classname);
-        $link = ucwords(str_replace("_", " ", end($classname)));
-        $link = html_writer::link($url, $link)
-            . "\n" . html_writer::tag('span', $values->classname, ['class' => 'task-class']);
+            $classname = explode("\\", $values->classname);
+            $link = ucwords(str_replace("_", " ", end($classname)));
+            $link = html_writer::link($url, $link)
+                . "\n" . html_writer::tag('span', $values->classname, ['class' => 'task-class']);
 
-        return $link;
+            return $link;
+        }
+
     }
 
 }
