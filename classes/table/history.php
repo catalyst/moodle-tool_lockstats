@@ -148,8 +148,10 @@ class history extends table_sql {
      */
     public function col_classname($values) {
         global $DB;
-        if ($this->is_downloading()) {
-            return $values->taskid;
+
+        if ($this->is_downloading() && !empty($values->classname)) {
+            // Return just the classname, no formatting needed.
+            return $values->classname;
         }
 
         // Classname can occasionally be empty from adhoc tasks.
@@ -157,7 +159,8 @@ class history extends table_sql {
             // If there is no class information, use a normalised resource key for the lock.
             $resourcekey = $DB->get_field('tool_lockstats_locks', 'resourcekey', ['id' => $values->taskid]);
             if ($resourcekey !== false && !empty($resourcekey)) {
-                return $resourcekey;
+                $name = str_replace("\\", " ", $resourcekey);
+                return ucwords(str_replace("_", " ", $name));
             } else {
                 // If the lock record is missing, display a message.
                 return get_string('table_missinglock', 'tool_lockstats');
