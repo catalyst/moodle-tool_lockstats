@@ -225,5 +225,29 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019042303, 'tool', 'lockstats');
     }
 
+    if ($oldversion < 2020051200) {
+
+        // Define index classname (not unique) to be added to tool_lockstats_history.
+        $table = new xmldb_table('tool_lockstats_history');
+        $index = new xmldb_index('classname', XMLDB_INDEX_NOTUNIQUE, array('classname'));
+
+        // Conditionally launch add index classname.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index type (not unique) to be added to tool_lockstats_history.
+        $table = new xmldb_table('tool_lockstats_history');
+        $index = new xmldb_index('type', XMLDB_INDEX_NOTUNIQUE, array('type'));
+
+        // Conditionally launch add index type.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Lockstats savepoint reached.
+        upgrade_plugin_savepoint(true, 2020051200, 'tool', 'lockstats');
+    }
+
     return true;
 }
