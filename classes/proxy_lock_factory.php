@@ -226,7 +226,7 @@ class proxy_lock_factory implements lock_factory {
      * @return false|stdClass
      */
     private function log_lock($resourcekey) {
-        global $DB;
+        global $CFG, $DB;
 
         $params = ['resourcekey' => $resourcekey];
 
@@ -253,6 +253,19 @@ class proxy_lock_factory implements lock_factory {
                 $record->latency = 0;
             }
             $this->update_lock_type($record);
+
+            if ($record->type === LOCKSTAT_UNKNOWN) {
+                // This may be a plain lock. Grab some stacktrace info to store.
+                $callertrace = debug_backtrace(true, 3)[2];
+                if ($callertrace && array_key_exists('class', $callertrace)) {
+                    $caller = $callertrace['class'] . $callertrace['type'] . $callertrace['function'];
+                } else if ($callertrace && array_key_exists('file', $callertrace) && array_key_exists('line', $callertrace)) {
+                    $caller = str_replace($CFG->dirroot, '', $callertrace['file']) . ' on line ' . $callertrace['line'];
+                }
+                $record->classname = $caller;
+                $record->component = 'moodle';
+            }
+
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
             $record->gained = time();
@@ -469,6 +482,7 @@ class proxy_lock_factory implements lock_factory {
      * @param stdClass $record
      */
     private function update_lock_type($record) {
+        global $DB;
         $record->type = LOCKSTAT_UNKNOWN;
 
         if ($record->resourcekey == 'core_cron') {
@@ -495,9 +509,16 @@ class proxy_lock_factory implements lock_factory {
         }
 
         if (isset($record->classname)) {
-            $scheduledtask = manager::scheduled_task_from_record($record);
-            if ($scheduledtask) {
-                $record->type = LOCKSTAT_SCHEDULED;
+            // Check if it is definitely a scheduled task before setting type.
+            $scheduledparams = ['classname' => $record->resourcekey];
+            $scheduledselect = $DB->sql_compare_text('classname') . ' = ' . $DB->sql_compare_text(':classname');
+            $scheduledrecord = $DB->get_record_select('task_scheduled', $scheduledselect, $scheduledparams);
+
+            if (!empty($scheduledrecord)) {
+                $scheduledtask = manager::scheduled_task_from_record($record);
+                if ($scheduledtask) {
+                    $record->type = LOCKSTAT_SCHEDULED;
+                }
             }
         }
 
