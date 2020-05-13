@@ -98,14 +98,13 @@ class adhoc_tasks extends html_table {
 
         $concat = $DB->sql_concat("'adhoc_'", 'ta.id');
         $faildelaysubquery = "
-           SELECT COUNT(ta.*) AS faildelay
+           SELECT COUNT(*) AS faildelay
              FROM {task_adhoc} ta
              JOIN {tool_lockstats_locks} tll ON tll.resourcekey = $concat
             WHERE ta.classname = classes.classname
                   AND ta.faildelay > 0";
-
         $runningsubquery = "
-           SELECT COUNT(ta.*)
+           SELECT COUNT(*)
              FROM {task_adhoc} ta
              JOIN {tool_lockstats_locks} tll ON tll.resourcekey = $concat
             WHERE ta.classname = classes.classname
@@ -133,7 +132,7 @@ class adhoc_tasks extends html_table {
                   component";
 
         $sql = "
-           SELECT DISTINCT ON (classes.classname)
+           SELECT DISTINCT
                   classes.classname,
                   classes.component,
                   ($queuedupsubquery  ) queuedup,
