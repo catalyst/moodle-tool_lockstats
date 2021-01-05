@@ -68,15 +68,17 @@ class proxy_lock_testcase extends advanced_testcase {
             $this->assertNotEmpty($lock1, 'Get a lock');
             $current = new tool_lockstats\table\locks();
 
-            if ($lockfactory->supports_timeout()) {
-                // This should timeout.
-                $lock2 = $lockfactory->get_lock('\abc', 2);
-                $this->assertFalse($lock2, 'Cannot get a stacked lock');
-            }
             // Current locks table should have the lock.
             $this->assertTrue( strpos($current->data[0]->cells[0]->text, '\abc') !== false );
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');
+
+            if ($lockfactory->supports_timeout()) {
+                // This should timeout.
+                $lock2 = $lockfactory->get_lock('\abc', 2);
+                $this->assertNotEmpty($lock2, 'Get a lock');
+                $this->assertTrue($lock2->release(), 'Cannot get a stacked lock');
+            }
 
             // Lock released, current locks table should be empty.
             $current = new tool_lockstats\table\locks();
