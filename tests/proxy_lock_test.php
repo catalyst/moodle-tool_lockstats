@@ -40,7 +40,7 @@ class proxy_lock_testcase extends advanced_testcase {
     /**
      * Clean up the database.
      */
-    protected function setUp() {
+    protected function setUp() : void {
         global $CFG, $DB;
 
         $dbtype = clean_param($DB->get_dbfamily(), PARAM_ALPHA);
@@ -80,7 +80,7 @@ class proxy_lock_testcase extends advanced_testcase {
                 }
             }
             // Current locks table should have the lock.
-            $this->assertContains('\abc', $current->data[0]->cells[0]->text);
+            $this->assertTrue( strpos($current->data[0]->cells[0]->text, '\abc') !== false );
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');
 
