@@ -69,7 +69,7 @@ class proxy_lock_testcase extends advanced_testcase {
             $current = new tool_lockstats\table\locks();
 
             // Current locks table should have the lock.
-            $this->assertContains('\abc', $current->data[0]->cells[0]->text);
+            $this->assertTrue( strpos($current->data[0]->cells[0]->text, '\abc') !== false );
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');
 
