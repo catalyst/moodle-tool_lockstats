@@ -4,9 +4,9 @@ name: Moodle plugin CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ MOODLE_310_STABLE ]
   pull_request:
-    branches: [ master ]
+    branches: [ MOODLE_310_STABLE ]
 
 jobs:
   citest:
@@ -44,12 +44,9 @@ jobs:
       fail-fast: false
       matrix:
         database: ['pgsql', 'mariadb']
-        moodle-branch: ['MOODLE_39_STABLE', 'MOODLE_310_STABLE', 'master']
+        moodle-branch: ['MOODLE_310_STABLE', 'MOODLE_311_STABLE', 'master']
         node: ['14.15.1']
-        php: ['7.3', '7.4']
-        include:
-          - {moodle-branch: 'MOODLE_37_STABLE', php: '7.1', node: '14.15.1', database: 'mariadb'}
-          - {moodle-branch: 'MOODLE_37_STABLE', php: '7.1', node: '14.15.1', database: 'pgsql'}
+        php: ['7.2', '7.3', '7.4']
 
     steps:
       - name: Check out repository code
