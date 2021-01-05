@@ -136,7 +136,7 @@ class proxy_lock_factory implements lock_factory {
     /**
      * Get a lock within the specified timeout or return false.
      *
-     * @param string $task - The identifier for the lock. Should use frankenstyle prefix.
+     * @param string $resourcekey - The identifier for the lock. Should use frankenstyle prefix.
      * @param int $timeout - The number of seconds to wait for a lock before giving up.
      *                       Not all lock types will support this.
      * @param int $maxlifetime - The number of seconds to wait before reclaiming a stale lock.
@@ -449,7 +449,7 @@ class proxy_lock_factory implements lock_factory {
      * Fill in more data for adhoc and scheduled tasks
      *
      * @param stdClass $record
-     * @param stdClass $record
+     * @param stdClass $resourcekey
      * @return stdClass $records to insert for adhoc and scheduled tasks
      */
     private function fill_more_for_tasks($record, $resourcekey) {

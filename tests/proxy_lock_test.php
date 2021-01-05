@@ -40,7 +40,7 @@ class proxy_lock_testcase extends advanced_testcase {
     /**
      * Clean up the database.
      */
-    protected function setUp() {
+    protected function setUp() : void {
         global $CFG, $DB;
 
         $dbtype = clean_param($DB->get_dbfamily(), PARAM_ALPHA);
@@ -68,21 +68,17 @@ class proxy_lock_testcase extends advanced_testcase {
             $this->assertNotEmpty($lock1, 'Get a lock');
             $current = new tool_lockstats\table\locks();
 
-            if ($lockfactory->supports_timeout()) {
-                if ($lockfactory->supports_recursion()) {
-                    $lock2 = $lockfactory->get_lock('\abc', 2);
-                    $this->assertNotEmpty($lock2, 'Get a stacked lock');
-                    $this->assertTrue($lock2->release(), 'Release a stacked lock');
-                } else {
-                    // This should timeout.
-                    $lock2 = $lockfactory->get_lock('\abc', 2);
-                    $this->assertFalse($lock2, 'Cannot get a stacked lock');
-                }
-            }
             // Current locks table should have the lock.
-            $this->assertContains('\abc', $current->data[0]->cells[0]->text);
+            $this->assertTrue( strpos($current->data[0]->cells[0]->text, '\abc') !== false );
             // Release the lock.
             $this->assertTrue($lock1->release(), 'Release a lock');
+
+            if ($lockfactory->supports_timeout()) {
+                // This should timeout.
+                $lock2 = $lockfactory->get_lock('\abc', 2);
+                $this->assertNotEmpty($lock2, 'Get a lock');
+                $this->assertTrue($lock2->release(), 'Cannot get a stacked lock');
+            }
 
             // Lock released, current locks table should be empty.
             $current = new tool_lockstats\table\locks();
