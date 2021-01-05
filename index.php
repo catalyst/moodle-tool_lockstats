@@ -102,6 +102,11 @@ echo html_writer::link($reseturl, $resettext);
 
 echo $OUTPUT->footer();
 
+/**
+ * Releases all locks
+ *
+ * @param array $locks
+ */
 function releasealllocks($locks) {
     if (isset($locks)) {
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');

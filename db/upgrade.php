@@ -25,6 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade the plugin.
+ *
+ * @param int $oldversion
+ * @return bool always true
+ */
 function xmldb_tool_lockstats_upgrade($oldversion) {
     global $DB, $CFG;
 
