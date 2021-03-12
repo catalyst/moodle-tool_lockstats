@@ -130,6 +130,7 @@ class locks extends html_table {
     /**
      * Get adhoc record by id.
      *
+     * @param int $adhocid
      * @return object
      */
     public function get_adhoc_record($adhocid) {
@@ -140,7 +141,8 @@ class locks extends html_table {
     /**
      * Extract id of adhoc task
      *
-     * @return id of adhoc task
+     * @param string $task
+     * @return int|null of adhoc task
      */
     public static function get_adhoc_id_by_task($task) {
         preg_match(" /^adhoc_(\d+)$/", $task, $results);
