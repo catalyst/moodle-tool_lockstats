@@ -65,6 +65,12 @@ $detail->out(50, false);
 echo $OUTPUT->footer();
 
 
+/**
+ * Force release a lock.
+ *
+ * @param string $resourcekey
+ * @param string $sesskey
+ */
 function releaselock($resourcekey, $sesskey) {
     if (isset($resourcekey) && confirm_sesskey($sesskey)) {
         $cronlockfactory = \core\lock\lock_config::get_lock_factory('cron');

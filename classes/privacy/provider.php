@@ -27,7 +27,6 @@ use core_privacy\local\metadata\null_provider;
 use core_privacy\local\legacy_polyfill;
 /**
  * Class provider
- * @package tool_lockstats\privacy
  */
 class provider implements null_provider {
     use legacy_polyfill;
