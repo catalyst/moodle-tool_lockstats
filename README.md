@@ -7,6 +7,18 @@ A lock statistics admin tool, specifically tailored to report on cron task timin
 This tool exposes which tasks are currently running and where, and also shows a detailed
 history of how long each task has taken in the past.
 
+# Warning
+
+Since Moodle 3.10 there is now an internal record of which tasks are running and their host
+and pid and very similar metadata to what this plugin records. The reporting in core is not
+quite the same but for simple visbiity of what tasks are currently running this plugin is
+mostly redudant. See also:
+
+https://tracker.moodle.org/browse/MDL-67211
+
+As the reports in core are improved more this plugin will be fully redundant, so it is best
+to consider this plugin deprecated but with no clear timeline on when support will end.
+
 # How it works
 
 It implements a proxy lock factory which adds instrumentation around the real lock factory.
