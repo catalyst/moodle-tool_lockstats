@@ -19,6 +19,16 @@ https://tracker.moodle.org/browse/MDL-67211
 As the reports in core are improved more this plugin will be fully redundant, so it is best
 to consider this plugin deprecated but with no clear timeline on when support will end.
 
+# Branches
+
+| Moodle verion      | Branch            |
+| ------------------ | ----------------- |
+| Moodle 2.7 to 3.8  | master            |
+| Moodle 3.9         | MOODLE_39_STABLE  |
+| Moodle 3.10 - 3.11 | MOODLE_310_STABLE |
+| Totara 9 - 12      | master            |
+| Totara 13          | MOODLE_310_STABLE |
+
 # How it works
 
 It implements a proxy lock factory which adds instrumentation around the real lock factory.
