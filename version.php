@@ -33,4 +33,3 @@ $plugin->release   = 2020051201;
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
 $plugin->component = 'tool_lockstats';
-$plugin->incompatible = 310;
