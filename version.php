@@ -28,8 +28,9 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$plugin->version   = 2020051200;
-$plugin->release   = 2020051200;
+$plugin->version   = 2021081300;
+$plugin->release   = 2021081300;
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
 $plugin->component = 'tool_lockstats';
+$plugin->supported = [310, 311];
