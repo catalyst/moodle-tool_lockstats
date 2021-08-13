@@ -1,10 +1,14 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ MOODLE_310_STABLE ]
+  pull_request:
+    branches: [ MOODLE_310_STABLE ]
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: 'ubuntu-latest'
 
     services:
       postgres:
