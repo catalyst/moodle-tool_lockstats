@@ -15,22 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Proxy lock factory, locks detail page.
  *
  * @package    tool_lockstats
- * @author     Nicholas Hoobin <nicholashoobin@catalyst-au.net>
- * @copyright  2017 Catalyst IT
+ * @author     Peter Burnett <peterburnett@catalyst-au.net>
+ * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Hook point for status check returns.
+ *
+ * @return array
+ */
+function tool_lockstats_status_checks() {
+    global $CFG;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+    if (!empty($CFG->lock_factory) && $CFG->lock_factory === "\\tool_lockstats\\proxy_lock_factory") {
+        return [
+            new \tool_lockstats\check\stale_lock()
+        ];
+    } else {
+        return [];
+    }
 }
-
-$plugin->version   = 2021081301;
-$plugin->release   = 2021081301;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7 release and upwards.
-$plugin->component = 'tool_lockstats';
-$plugin->supported = [310, 311];
