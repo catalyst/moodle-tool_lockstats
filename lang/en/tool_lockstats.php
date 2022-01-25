@@ -30,6 +30,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $string['blacklist'] = 'History blacklist';
 $string['blacklistdesc'] = 'These are identified by their classpath, eg. \tool_crawler\task\crawl_task';
+$string['checkstale_lock'] = 'Stale process locks';
 $string['cleanup'] = 'Cleanup history';
 $string['cleanupdesc'] = 'Automatically prune the history table after this value.';
 $string['debug'] = 'Debug';
@@ -46,12 +47,14 @@ $string['h1_detail'] = 'Task Details';
 $string['h1_slowest'] = 'Slowest tasks this week with a duration > {$a} seconds';
 $string['h1_nexttask'] = 'Next running tasks';
 $string['lock_in_use'] = 'Lock still in use by another process';
+$string['nostalelocks'] = 'No stale process locks older than 24 hours detected.';
 $string['pluginname'] = 'Cron Lock statistics';
 $string['privacy:metadata'] = 'Cron Lock statistics plugin does not store any personal data.';
 $string['release_all_locks'] = 'Release all stale locks';
 $string['release_lock'] = 'Release lock';
 $string['reset_header'] = 'Reset lock statistics history';
 $string['reset_text'] = 'Reset the lock stastics history.';
+$string['stalelocks'] = 'Stale process locks older than 24 hours detected.';
 $string['table_customdata'] = 'Custom data';
 $string['table_duration'] = 'Average Duration';
 $string['table_gained'] = 'Time gained';
