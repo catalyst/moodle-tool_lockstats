@@ -45,7 +45,7 @@ class proxy_lock_testcase extends advanced_testcase {
 
         $dbtype = clean_param($DB->get_dbfamily(), PARAM_ALPHA);
 
-        $lockfactoryclass = "\\core\\lock\\${dbtype}_lock_factory";
+        $lockfactoryclass = "\\core\\lock\\{$dbtype}_lock_factory";
         if (!class_exists($lockfactoryclass)) {
             $lockfactoryclass = '\core\lock\file_lock_factory';
         }
