@@ -24,7 +24,7 @@ namespace tool_lockstats\test;
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class stale_lock_testcase extends \advanced_testcase {
+class stale_lock_test extends \advanced_testcase {
     public function test_lock_staleness() {
         global $DB;
         $this->resetAfterTest();

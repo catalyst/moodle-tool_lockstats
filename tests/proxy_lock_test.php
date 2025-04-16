@@ -36,7 +36,7 @@ if (!defined('MOODLE_INTERNAL')) {
  * @copyright  2017 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class proxy_lock_testcase extends advanced_testcase {
+class proxy_lock_test extends advanced_testcase {
     /**
      * Clean up the database.
      */
@@ -45,7 +45,7 @@ class proxy_lock_testcase extends advanced_testcase {
 
         $dbtype = clean_param($DB->get_dbfamily(), PARAM_ALPHA);
 
-        $lockfactoryclass = "\\core\\lock\\${dbtype}_lock_factory";
+        $lockfactoryclass = "\\core\\lock\\{$dbtype}_lock_factory";
         if (!class_exists($lockfactoryclass)) {
             $lockfactoryclass = '\core\lock\file_lock_factory';
         }

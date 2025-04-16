@@ -36,7 +36,7 @@ if (!defined('MOODLE_INTERNAL')) {
  * @copyright  2020 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class adhoc_tasks_table_testcase extends advanced_testcase {
+class adhoc_tasks_test extends advanced_testcase {
     public function test_history_table_constructor() {
         // This function tests the constructor for the history table for Cross DB compatability.
         // This test contains no assertions, but ensures there are no exceptions.
