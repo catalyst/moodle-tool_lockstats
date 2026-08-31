@@ -23,45 +23,59 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\setting\page\externalpage;
+use core\setting\part\page;
+use core\setting\type\checkbox;
+use core\setting\type\duration;
+use core\setting\type\textarea;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
-}
+defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $url = new moodle_url("/admin/tool/lockstats");
-    $ADMIN->add('server', new admin_externalpage('tool_lockstats', get_string('pluginname', 'tool_lockstats'), $url));
+    $ADMIN->add('server', new externalpage('tool_lockstats', get_string('pluginname', 'tool_lockstats'), $url));
 
     // Local plugin settings.
-    $settings = new admin_settingpage('tool_lockstats_settings', get_string('pluginname', 'tool_lockstats'));
+    $settings = new page('tool_lockstats_settings', get_string('pluginname', 'tool_lockstats'));
 
     $ADMIN->add('tools', $settings);
 
     if (!during_initial_install()) {
+        $settings->add(new checkbox(
+            'tool_lockstats/enable',
+            new lang_string('enable', 'tool_lockstats'),
+            new lang_string('enabledesc', 'tool_lockstats'),
+            '1'
+        ));
 
-        $settings->add(new admin_setting_configcheckbox('tool_lockstats/enable',
-            new lang_string('enable',        'tool_lockstats'),
-            new lang_string('enabledesc',    'tool_lockstats'),
-            '1'));
-
-        $settings->add(new admin_setting_configduration('tool_lockstats/cleanup',
-            new lang_string('cleanup',     'tool_lockstats'),
+        $settings->add(new duration(
+            'tool_lockstats/cleanup',
+            new lang_string('cleanup', 'tool_lockstats'),
             new lang_string('cleanupdesc', 'tool_lockstats'),
-            86400 * 30, 86400));
+            86400 * 30,
+            86400
+        ));
 
-        $settings->add(new admin_setting_configtextarea('tool_lockstats/blacklist',
-            new lang_string('blacklist',     'tool_lockstats'),
+        $settings->add(new textarea(
+            'tool_lockstats/blacklist',
+            new lang_string('blacklist', 'tool_lockstats'),
             new lang_string('blacklistdesc', 'tool_lockstats'),
-            'core_cron'));
+            'core_cron'
+        ));
 
-        $settings->add(new admin_setting_configduration('tool_lockstats/threshold',
-           new lang_string('threshold',     'tool_lockstats'),
-           new lang_string('thresholddesc', 'tool_lockstats'),
-           60 * 5, 60));
+        $settings->add(new duration(
+            'tool_lockstats/threshold',
+            new lang_string('threshold', 'tool_lockstats'),
+            new lang_string('thresholddesc', 'tool_lockstats'),
+            60 * 5,
+            60
+        ));
 
-        $settings->add(new admin_setting_configcheckbox('tool_lockstats/debug',
-            new lang_string('debug',        'tool_lockstats'),
-            new lang_string('debugdesc',    'tool_lockstats'),
-            '0'));
+        $settings->add(new checkbox(
+            'tool_lockstats/debug',
+            new lang_string('debug', 'tool_lockstats'),
+            new lang_string('debugdesc', 'tool_lockstats'),
+            '0'
+        ));
     }
 }
