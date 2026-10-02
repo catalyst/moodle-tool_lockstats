@@ -179,8 +179,8 @@ class adhoc_tasks extends html_table {
                 new html_table_cell($class->running),
                 new html_table_cell($class->processed),
                 new html_table_cell($class->failed),
-                new html_table_cell(format_time(floor($class->latencyavg))),
-                new html_table_cell(format_time(floor($class->latencymax))),
+                new html_table_cell($class->latencyavg === null ? '' : format_time(floor($class->latencyavg))),
+                new html_table_cell($class->latencymax === null ? '' : format_time(floor($class->latencymax))),
             ));
 
             $data[] = $row;
